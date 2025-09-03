@@ -1,0 +1,1085 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    sage: "var(--sage)",
+                    orange: "var(--orange)",
+                    blue: "var(--blue)",
+                    navy: "var(--navy)",
+                },
+                fontFamily: {
+                    sans: ["Inter", "system-ui", "sans-serif"],
+                    mono: ["JetBrains Mono", "monospace"],
+                }
+            },
+        }
+    };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --background: hsl(130 25% 95%);
+            --foreground: hsl(220 25% 20%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(220 25% 20%);
+            --primary: hsl(35 88% 55%);
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(130 25% 90%);
+            --secondary-foreground: hsl(220 25% 20%);
+            --muted: hsl(130 15% 88%);
+            --muted-foreground: hsl(220 15% 45%);
+            --accent: hsl(223 69% 60%);
+            --accent-foreground: hsl(0 0% 100%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(130 15% 85%);
+            --input: hsl(0 0% 100%);
+            --ring: hsl(223 69% 60%);
+            --sage: hsl(130 30% 76%);
+            --orange: hsl(35 88% 55%);
+            --blue: hsl(223 69% 60%);
+            --navy: hsl(220 25% 28%);
+            --radius: 0.5rem;
+        }
+
+        .dark {
+            --background: hsl(220 25% 8%);
+            --foreground: hsl(130 25% 95%);
+            --card: hsl(220 25% 12%);
+            --card-foreground: hsl(130 25% 95%);
+            --primary: hsl(35 88% 55%);
+            --primary-foreground: hsl(220 25% 8%);
+            --secondary: hsl(220 25% 15%);
+            --secondary-foreground: hsl(130 25% 95%);
+            --muted: hsl(220 15% 20%);
+            --muted-foreground: hsl(130 15% 65%);
+            --accent: hsl(223 69% 60%);
+            --accent-foreground: hsl(220 25% 8%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(220 15% 25%);
+            --input: hsl(220 25% 15%);
+            --ring: hsl(223 69% 60%);
+        }
+
+        * {
+            border-color: hsl(var(--border));
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-float-delayed {
+            animation: float 6s ease-in-out infinite;
+            animation-delay: -2s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .animate-pulse-soft {
+            animation: pulse-soft 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .gradient-mesh {
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(194, 231, 201, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(66, 101, 214, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(242, 172, 32, 0.1) 0%, transparent 50%);
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-blur {
+            backdrop-filter: blur(12px);
+            background: rgba(194, 231, 201, 0.8);
+        }
+
+        .project-card:hover .project-overlay {
+            opacity: 1;
+        }
+
+        .project-overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .skill-bar {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: skill-shine 2s infinite;
+        }
+
+        @keyframes skill-shine {
+            0% { left: -100%; }
+            50%, 100% { left: 100%; }
+        }
+
+        .avatar-placeholder {
+            background: linear-gradient(135deg, hsl(var(--sage)), hsl(var(--blue)));
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-placeholder::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: avatar-shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes avatar-shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: hsl(var(--muted));
+            border-radius: 18px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: hsl(var(--muted-foreground));
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-border/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <a href="#home" class="text-2xl font-bold text-navy">Portfolio</a>
+                </div>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" class="text-navy hover:text-accent transition-colors duration-200 font-medium">Home</a>
+                        <a href="#about" class="text-navy hover:text-accent transition-colors duration-200 font-medium">About</a>
+                        <a href="#projects" class="text-navy hover:text-accent transition-colors duration-200 font-medium">Projects</a>
+                        <a href="#chat" class="text-navy hover:text-accent transition-colors duration-200 font-medium">Chat</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <button class="bg-orange hover:bg-orange/90 text-white px-6 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105">
+                        Get In Touch
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center gradient-mesh relative overflow-hidden">
+        <!-- Floating Particles -->
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="particle w-2 h-2 bg-accent/30 animate-float" style="top: 20%; left: 10%;"></div>
+            <div class="particle w-3 h-3 bg-orange/20 animate-float-delayed" style="top: 60%; left: 80%;"></div>
+            <div class="particle w-1 h-1 bg-blue/40 animate-pulse-soft" style="top: 40%; left: 20%;"></div>
+            <div class="particle w-2 h-2 bg-sage/30 animate-float" style="top: 80%; left: 60%;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="scroll-reveal">
+                <h1 class="text-5xl md:text-7xl font-bold text-navy mb-6">
+                    Creative
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange to-accent">
+                        Developer
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+                    Building exceptional digital experiences with modern technologies and innovative design. 
+                    Let's create something amazing together.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                    <button class="bg-orange hover:bg-orange/90 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                        View My Work
+                    </button>
+                    <button class="bg-white/10 backdrop-blur hover:bg-white/20 text-navy px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/20">
+                        Download Resume
+                    </button>
+                </div>
+
+                <!-- Featured Technologies -->
+                <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-muted-foreground">
+                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                        <i class="fab fa-react text-blue"></i>
+                        React
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                        <i class="fab fa-js-square text-orange"></i>
+                        TypeScript
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                        <i class="fab fa-node text-accent"></i>
+                        Node.js
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
+                        <i class="fas fa-database text-sage"></i>
+                        Database
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="scroll-reveal text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-navy mb-6">About Me</h2>
+                <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+                    Passionate developer with a focus on creating meaningful digital experiences that solve real problems.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="scroll-reveal">
+                    <!-- Professional headshot placeholder -->
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=800" 
+                         alt="Professional headshot" 
+                         class="rounded-2xl shadow-2xl w-full max-w-md mx-auto" />
+                </div>
+
+                <div class="space-y-8">
+                    <div class="scroll-reveal">
+                        <h3 class="text-2xl font-bold text-navy mb-4">My Journey</h3>
+                        <p class="text-muted-foreground leading-relaxed mb-6">
+                            With over 5 years of experience in full-stack development, I specialize in creating 
+                            scalable web applications and innovative user interfaces. My passion lies in the 
+                            intersection of design and technology.
+                        </p>
+                    </div>
+
+                    <!-- Skills Grid -->
+                    <div class="scroll-reveal">
+                        <h4 class="text-xl font-bold text-navy mb-6">Core Skills</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-medium text-navy">Frontend Development</span>
+                                        <span class="text-sm text-muted-foreground">95%</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="skill-bar bg-gradient-to-r from-orange to-accent h-2 rounded-full" style="width: 95%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-medium text-navy">Backend Architecture</span>
+                                        <span class="text-sm text-muted-foreground">88%</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="skill-bar bg-gradient-to-r from-blue to-sage h-2 rounded-full" style="width: 88%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-medium text-navy">UI/UX Design</span>
+                                        <span class="text-sm text-muted-foreground">92%</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="skill-bar bg-gradient-to-r from-sage to-orange h-2 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-medium text-navy">Database Design</span>
+                                        <span class="text-sm text-muted-foreground">85%</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="skill-bar bg-gradient-to-r from-accent to-blue h-2 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-medium text-navy">DevOps & Deployment</span>
+                                        <span class="text-sm text-muted-foreground">80%</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="skill-bar bg-gradient-to-r from-orange to-sage h-2 rounded-full" style="width: 80%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-medium text-navy">AI Integration</span>
+                                        <span class="text-sm text-muted-foreground">75%</span>
+                                    </div>
+                                    <div class="w-full bg-muted rounded-full h-2">
+                                        <div class="skill-bar bg-gradient-to-r from-blue to-orange h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Experience Highlights -->
+                    <div class="scroll-reveal">
+                        <h4 class="text-xl font-bold text-navy mb-6">Experience</h4>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm">
+                                <div class="w-12 h-12 bg-gradient-to-br from-orange to-accent rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-code text-white"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-navy">Senior Full Stack Developer</h5>
+                                    <p class="text-sm text-muted-foreground">Tech Company • 2021 - Present</p>
+                                    <p class="text-sm text-muted-foreground mt-1">Leading development of scalable web applications</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue to-sage rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-laptop-code text-white"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold text-navy">Frontend Developer</h5>
+                                    <p class="text-sm text-muted-foreground">Digital Agency • 2019 - 2021</p>
+                                    <p class="text-sm text-muted-foreground mt-1">Specialized in React and modern frontend frameworks</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-gradient-to-br from-sage/10 to-blue/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="scroll-reveal text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-navy mb-6">Featured Projects</h2>
+                <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+                    A collection of projects that showcase my skills and passion for creating exceptional digital experiences.
+                </p>
+            </div>
+
+            <!-- @COMPONENT: ProjectsGrid [dynamically loaded from database] -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project 1 -->
+                <div class="project-card scroll-reveal group cursor-pointer">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                        <!-- Modern e-commerce platform interface mockup -->
+                        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400" 
+                             alt="E-commerce platform project" 
+                             class="w-full h-48 object-cover" />
+                        
+                        <div class="project-overlay absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">E-Commerce Platform</h3>
+                                <p class="text-sm opacity-90">Modern shopping experience with AI recommendations</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-orange/10 text-orange text-xs font-medium rounded-full">React</span>
+                                <span class="px-3 py-1 bg-blue/10 text-blue text-xs font-medium rounded-full">Node.js</span>
+                                <span class="px-3 py-1 bg-sage/20 text-navy text-xs font-medium rounded-full">MongoDB</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-navy mb-2" data-bind="project.title">E-Commerce Platform</h3>
+                            <p class="text-muted-foreground text-sm mb-4" data-bind="project.description">
+                                Full-stack e-commerce solution with advanced search, real-time inventory, and AI-powered product recommendations.
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-blue hover:text-blue/80 text-sm font-medium">
+                                    <i class="fas fa-external-link-alt mr-1"></i>
+                                    Live Demo
+                                </a>
+                                <a href="#" class="text-navy hover:text-navy/80 text-sm font-medium">
+                                    <i class="fab fa-github mr-1"></i>
+                                    Source
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card scroll-reveal group cursor-pointer">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                        <!-- Modern dashboard interface design -->
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400" 
+                             alt="Analytics dashboard project" 
+                             class="w-full h-48 object-cover" />
+                        
+                        <div class="project-overlay absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">Analytics Dashboard</h3>
+                                <p class="text-sm opacity-90">Real-time data visualization and insights</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-blue/10 text-blue text-xs font-medium rounded-full">Vue.js</span>
+                                <span class="px-3 py-1 bg-orange/10 text-orange text-xs font-medium rounded-full">D3.js</span>
+                                <span class="px-3 py-1 bg-sage/20 text-navy text-xs font-medium rounded-full">FastAPI</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-navy mb-2" data-bind="project.title">Analytics Dashboard</h3>
+                            <p class="text-muted-foreground text-sm mb-4" data-bind="project.description">
+                                Interactive dashboard for business intelligence with real-time data processing and beautiful visualizations.
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-blue hover:text-blue/80 text-sm font-medium">
+                                    <i class="fas fa-external-link-alt mr-1"></i>
+                                    Live Demo
+                                </a>
+                                <a href="#" class="text-navy hover:text-navy/80 text-sm font-medium">
+                                    <i class="fab fa-github mr-1"></i>
+                                    Source
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card scroll-reveal group cursor-pointer">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                        <!-- Mobile app interface design -->
+                        <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400" 
+                             alt="Mobile app project" 
+                             class="w-full h-48 object-cover" />
+                        
+                        <div class="project-overlay absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">Mobile Task App</h3>
+                                <p class="text-sm opacity-90">Cross-platform productivity solution</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-sage/20 text-navy text-xs font-medium rounded-full">React Native</span>
+                                <span class="px-3 py-1 bg-blue/10 text-blue text-xs font-medium rounded-full">Firebase</span>
+                                <span class="px-3 py-1 bg-orange/10 text-orange text-xs font-medium rounded-full">Redux</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-navy mb-2" data-bind="project.title">Mobile Task App</h3>
+                            <p class="text-muted-foreground text-sm mb-4" data-bind="project.description">
+                                Cross-platform mobile application for task management with offline support and team collaboration features.
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-blue hover:text-blue/80 text-sm font-medium">
+                                    <i class="fas fa-mobile-alt mr-1"></i>
+                                    App Store
+                                </a>
+                                <a href="#" class="text-navy hover:text-navy/80 text-sm font-medium">
+                                    <i class="fab fa-github mr-1"></i>
+                                    Source
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="project-card scroll-reveal group cursor-pointer">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                        <!-- AI chatbot interface -->
+                        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400" 
+                             alt="AI chatbot project" 
+                             class="w-full h-48 object-cover" />
+                        
+                        <div class="project-overlay absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">AI Chat Assistant</h3>
+                                <p class="text-sm opacity-90">Intelligent conversational interface</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-orange/10 text-orange text-xs font-medium rounded-full">Python</span>
+                                <span class="px-3 py-1 bg-blue/10 text-blue text-xs font-medium rounded-full">TensorFlow</span>
+                                <span class="px-3 py-1 bg-sage/20 text-navy text-xs font-medium rounded-full">OpenAI</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-navy mb-2" data-bind="project.title">AI Chat Assistant</h3>
+                            <p class="text-muted-foreground text-sm mb-4" data-bind="project.description">
+                                Intelligent chat assistant with natural language processing and context-aware responses.
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-blue hover:text-blue/80 text-sm font-medium">
+                                    <i class="fas fa-external-link-alt mr-1"></i>
+                                    Live Demo
+                                </a>
+                                <a href="#" class="text-navy hover:text-navy/80 text-sm font-medium">
+                                    <i class="fab fa-github mr-1"></i>
+                                    Source
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="project-card scroll-reveal group cursor-pointer">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                        <!-- Blockchain application interface -->
+                        <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400" 
+                             alt="Blockchain project" 
+                             class="w-full h-48 object-cover" />
+                        
+                        <div class="project-overlay absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">DeFi Platform</h3>
+                                <p class="text-sm opacity-90">Decentralized finance application</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-sage/20 text-navy text-xs font-medium rounded-full">Solidity</span>
+                                <span class="px-3 py-1 bg-orange/10 text-orange text-xs font-medium rounded-full">Web3.js</span>
+                                <span class="px-3 py-1 bg-blue/10 text-blue text-xs font-medium rounded-full">React</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-navy mb-2" data-bind="project.title">DeFi Platform</h3>
+                            <p class="text-muted-foreground text-sm mb-4" data-bind="project.description">
+                                Decentralized finance platform with staking, lending, and yield farming capabilities.
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-blue hover:text-blue/80 text-sm font-medium">
+                                    <i class="fas fa-external-link-alt mr-1"></i>
+                                    Live Demo
+                                </a>
+                                <a href="#" class="text-navy hover:text-navy/80 text-sm font-medium">
+                                    <i class="fab fa-github mr-1"></i>
+                                    Source
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 6 -->
+                <div class="project-card scroll-reveal group cursor-pointer">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:scale-105">
+                        <!-- IoT dashboard design -->
+                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400" 
+                             alt="IoT dashboard project" 
+                             class="w-full h-48 object-cover" />
+                        
+                        <div class="project-overlay absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent flex items-end">
+                            <div class="p-6 text-white">
+                                <h3 class="text-xl font-bold mb-2">IoT Monitoring</h3>
+                                <p class="text-sm opacity-90">Smart device management system</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-blue/10 text-blue text-xs font-medium rounded-full">Angular</span>
+                                <span class="px-3 py-1 bg-orange/10 text-orange text-xs font-medium rounded-full">MQTT</span>
+                                <span class="px-3 py-1 bg-sage/20 text-navy text-xs font-medium rounded-full">InfluxDB</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-navy mb-2" data-bind="project.title">IoT Monitoring</h3>
+                            <p class="text-muted-foreground text-sm mb-4" data-bind="project.description">
+                                Real-time IoT device monitoring dashboard with alerts, analytics, and remote control capabilities.
+                            </p>
+                            <div class="flex gap-3">
+                                <a href="#" class="text-blue hover:text-blue/80 text-sm font-medium">
+                                    <i class="fas fa-external-link-alt mr-1"></i>
+                                    Live Demo
+                                </a>
+                                <a href="#" class="text-navy hover:text-navy/80 text-sm font-medium">
+                                    <i class="fab fa-github mr-1"></i>
+                                    Source
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: ProjectsGrid -->
+
+            <div class="text-center mt-12">
+                <button class="bg-white hover:bg-white/90 text-navy px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg">
+                    View All Projects
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Section -->
+    <section id="chat" class="py-20 bg-white/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="scroll-reveal text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-navy mb-6">Chat with My AI</h2>
+                <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+                    Have a conversation with my AI assistant. Ask about my projects, skills, or anything else you'd like to know.
+                </p>
+            </div>
+
+            <div class="max-w-4xl mx-auto">
+                <div class="grid lg:grid-cols-2 gap-12 items-start">
+                    <!-- @COMPONENT: AvatarDisplay [3D avatar integration point] -->
+                    <div class="scroll-reveal">
+                        <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                            <h3 class="text-2xl font-bold text-navy mb-6">AI Avatar</h3>
+                            
+                            <!-- 3D Avatar Placeholder -->
+                            <!-- @FUNCTIONALITY: This should integrate with 3D avatar model with blend shapes and lip-sync -->
+                            <div class="avatar-placeholder w-64 h-64 mx-auto mb-6" data-implementation="3D avatar with animations: idle, waving, cheering, head nod/shake, talking, backflip">
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <div class="text-center">
+                                        <i class="fas fa-robot text-6xl text-white/80 mb-4"></i>
+                                        <p class="text-white/60 font-medium">3D Avatar Loading...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Avatar Status -->
+                            <div class="flex items-center justify-center gap-2 mb-4">
+                                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                                <span class="text-sm font-medium text-navy" data-bind="avatar.status">Online & Ready</span>
+                            </div>
+
+                            <!-- Avatar Animation Controls -->
+                            <div class="grid grid-cols-2 gap-2 mb-6">
+                                <button class="px-4 py-2 bg-sage/20 hover:bg-sage/30 text-navy rounded-lg text-sm font-medium transition-colors" data-event="click:triggerAnimation" data-animation="wave">
+                                    👋 Wave
+                                </button>
+                                <button class="px-4 py-2 bg-blue/10 hover:bg-blue/20 text-navy rounded-lg text-sm font-medium transition-colors" data-event="click:triggerAnimation" data-animation="cheer">
+                                    🎉 Cheer
+                                </button>
+                                <button class="px-4 py-2 bg-orange/10 hover:bg-orange/20 text-navy rounded-lg text-sm font-medium transition-colors" data-event="click:triggerAnimation" data-animation="nod">
+                                    ✅ Nod
+                                </button>
+                                <button class="px-4 py-2 bg-sage/20 hover:bg-sage/30 text-navy rounded-lg text-sm font-medium transition-colors" data-event="click:triggerAnimation" data-animation="backflip">
+                                    🤸 Flip
+                                </button>
+                            </div>
+
+                            <p class="text-sm text-muted-foreground">
+                                Avatar responds with expressions and lip-sync during conversations
+                            </p>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: AvatarDisplay -->
+
+                    <!-- @COMPONENT: ChatInterface [AI chat integration point] -->
+                    <div class="scroll-reveal">
+                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                            <!-- Chat Header -->
+                            <div class="bg-gradient-to-r from-sage to-blue p-4">
+                                <h3 class="text-xl font-bold text-white">AI Assistant Chat</h3>
+                                <p class="text-white/80 text-sm">Ask me anything about my work and experience</p>
+                            </div>
+
+                            <!-- Chat Messages -->
+                            <div class="h-96 overflow-y-auto p-4 space-y-4" data-implementation="Scrollable chat history from database">
+                                <!-- AI Message -->
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-sage to-blue rounded-full flex items-center justify-center">
+                                        <i class="fas fa-robot text-white text-xs"></i>
+                                    </div>
+                                    <div class="bg-muted rounded-2xl rounded-tl-sm p-4 max-w-xs">
+                                        <p class="text-sm text-navy" data-mock="true">
+                                            Hello! I'm here to answer questions about my projects, skills, and experience. What would you like to know?
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- User Message -->
+                                <div class="flex items-start gap-3 flex-row-reverse">
+                                    <div class="w-8 h-8 bg-orange rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-xs"></i>
+                                    </div>
+                                    <div class="bg-orange rounded-2xl rounded-tr-sm p-4 max-w-xs">
+                                        <p class="text-sm text-white" data-mock="true">
+                                            Tell me about your recent projects
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- AI Response with Typing -->
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-sage to-blue rounded-full flex items-center justify-center">
+                                        <i class="fas fa-robot text-white text-xs"></i>
+                                    </div>
+                                    <div class="typing-indicator" data-implementation="Show while AI is generating response">
+                                        <div class="typing-dot"></div>
+                                        <div class="typing-dot"></div>
+                                        <div class="typing-dot"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chat Input -->
+                            <div class="p-4 border-t border-border">
+                                <div class="flex gap-3">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Ask me anything..." 
+                                        class="flex-1 px-4 py-3 bg-muted border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-blue text-sm"
+                                        data-bind="chatInput.value"
+                                        data-event="keypress:handleChatSubmit"
+                                    />
+                                    <button 
+                                        class="bg-orange hover:bg-orange/90 text-white px-6 py-3 rounded-full font-medium transition-all duration-200 hover:scale-105"
+                                        data-event="click:sendChatMessage"
+                                        data-implementation="Send to AI API and trigger avatar response"
+                                    >
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span>AI Online</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-microphone"></i>
+                                        <span>Voice enabled</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Avatar active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Features -->
+                        <div class="mt-6 grid grid-cols-2 gap-4">
+                            <div class="bg-white/50 backdrop-blur p-4 rounded-xl">
+                                <h4 class="font-semibold text-navy mb-2">
+                                    <i class="fas fa-brain text-orange mr-2"></i>
+                                    Smart Responses
+                                </h4>
+                                <p class="text-sm text-muted-foreground">
+                                    AI trained on my portfolio and experience
+                                </p>
+                            </div>
+                            <div class="bg-white/50 backdrop-blur p-4 rounded-xl">
+                                <h4 class="font-semibold text-navy mb-2">
+                                    <i class="fas fa-volume-up text-blue mr-2"></i>
+                                    Voice Synthesis
+                                </h4>
+                                <p class="text-sm text-muted-foreground">
+                                    Text-to-speech with avatar lip-sync
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: ChatInterface -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-20 bg-gradient-to-br from-navy to-blue text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="scroll-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Let's Work Together</h2>
+                <p class="text-xl opacity-90 max-w-3xl mx-auto mb-8">
+                    Ready to bring your ideas to life? Let's discuss your project and create something amazing.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                    <button class="bg-orange hover:bg-orange/90 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105">
+                        Start a Project
+                    </button>
+                    <button class="bg-white/10 backdrop-blur hover:bg-white/20 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/20">
+                        Schedule a Call
+                    </button>
+                </div>
+
+                <!-- Contact Links -->
+                <div class="flex justify-center gap-8 text-lg">
+                    <a href="mailto:contact@portfolio.com" class="hover:text-orange transition-colors duration-200">
+                        <i class="fas fa-envelope mr-2"></i>
+                        Email
+                    </a>
+                    <a href="https://linkedin.com" class="hover:text-orange transition-colors duration-200">
+                        <i class="fab fa-linkedin mr-2"></i>
+                        LinkedIn
+                    </a>
+                    <a href="https://github.com" class="hover:text-orange transition-colors duration-200">
+                        <i class="fab fa-github mr-2"></i>
+                        GitHub
+                    </a>
+                    <a href="https://twitter.com" class="hover:text-orange transition-colors duration-200">
+                        <i class="fab fa-twitter mr-2"></i>
+                        Twitter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-lg font-bold mb-4">Professional Portfolio</p>
+                <p class="text-white/60 mb-6">Building the future, one project at a time.</p>
+                <div class="border-t border-white/20 pt-6">
+                    <p class="text-sm text-white/40">
+                        © 2024 Portfolio. All rights reserved. • Built with Next.js, TypeScript & Tailwind CSS
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll reveal animation
+        (() => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all scroll-reveal elements
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                observer.observe(el);
+            });
+        })();
+
+        // Smooth scrolling for navigation links
+        (() => {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        })();
+
+        // Navigation background on scroll
+        (() => {
+            const nav = document.querySelector('nav');
+            let lastScroll = 0;
+
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 100) {
+                    nav.classList.add('shadow-lg');
+                } else {
+                    nav.classList.remove('shadow-lg');
+                }
+
+                lastScroll = currentScroll;
+            });
+        })();
+
+        // Particle animation
+        (() => {
+            const particles = document.querySelectorAll('.particle');
+            
+            particles.forEach((particle, index) => {
+                const randomDelay = Math.random() * 2;
+                const randomDuration = 4 + Math.random() * 4;
+                
+                particle.style.animationDelay = `${randomDelay}s`;
+                particle.style.animationDuration = `${randomDuration}s`;
+            });
+        })();
+
+        // Chat simulation
+        (() => {
+            const chatInput = document.querySelector('[data-bind="chatInput.value"]');
+            const sendButton = document.querySelector('[data-event="click:sendChatMessage"]');
+            
+            if (chatInput && sendButton) {
+                const handleSendMessage = () => {
+                    const message = chatInput.value.trim();
+                    if (message) {
+                        // TODO: Implement actual chat functionality with AI API
+                        console.log('Sending message:', message);
+                        chatInput.value = '';
+                        
+                        // TODO: Trigger avatar animation for speaking
+                        // TODO: Send to AI backend and receive response
+                        // TODO: Update chat history in database
+                        // TODO: Trigger text-to-speech with lip-sync
+                    }
+                };
+
+                sendButton.addEventListener('click', handleSendMessage);
+                
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleSendMessage();
+                    }
+                });
+            }
+        })();
+
+        // Avatar animation buttons
+        (() => {
+            const animationButtons = document.querySelectorAll('[data-event="click:triggerAnimation"]');
+            
+            animationButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const animationType = button.getAttribute('data-animation');
+                    // TODO: Trigger 3D avatar animation based on type
+                    console.log('Triggering avatar animation:', animationType);
+                    
+                    // Visual feedback
+                    button.classList.add('bg-opacity-50');
+                    setTimeout(() => {
+                        button.classList.remove('bg-opacity-50');
+                    }, 200);
+                });
+            });
+        })();
+
+        // Project card interactions
+        (() => {
+            const projectCards = document.querySelectorAll('.project-card');
+            
+            projectCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    // TODO: Load additional project details from database
+                    console.log('Loading project details...');
+                });
+            });
+        })();
+
+        console.log('Portfolio loaded successfully! 🚀');
+        console.log('Ready for AI integration and 3D avatar implementation.');
+    </script>
+</body>
+</html>
