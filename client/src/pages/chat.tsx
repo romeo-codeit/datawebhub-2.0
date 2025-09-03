@@ -39,8 +39,8 @@ export default function Chat() {
       const response = await sendMessage(userMessage);
       
       // Set avatar animation based on response metadata
-      if (response.metadata) {
-        setAvatarAnimation(response.metadata.animation || "idle");
+      if (response.metadata && typeof response.metadata === 'object' && 'animation' in response.metadata) {
+        setAvatarAnimation((response.metadata as any).animation || "idle");
       }
       
       // Reset to idle after animation
@@ -97,7 +97,7 @@ export default function Chat() {
                 <ChatInterface 
                   messages={messages}
                   isLoading={isLoading}
-                  error={error}
+                  error={error || null}
                 />
                 
                 {/* Chat Input */}

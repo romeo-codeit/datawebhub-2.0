@@ -57,7 +57,7 @@ export class MemStorage implements IStorage {
         category: "mobile",
         technologies: ["React Native", "Expo", "SQLite", "Firebase", "Redux"],
         imageUrl: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&h=500",
-        demoUrl: undefined,
+        demoUrl: null,
         githubUrl: "https://github.com/user/task-manager",
         featured: "true",
         createdAt: new Date("2024-02-01")
@@ -124,8 +124,16 @@ export class MemStorage implements IStorage {
   async createProject(insertProject: InsertProject): Promise<Project> {
     const id = randomUUID();
     const project: Project = {
-      ...insertProject,
       id,
+      title: insertProject.title,
+      description: insertProject.description,
+      longDescription: insertProject.longDescription || null,
+      category: insertProject.category,
+      technologies: insertProject.technologies,
+      imageUrl: insertProject.imageUrl,
+      demoUrl: insertProject.demoUrl || null,
+      githubUrl: insertProject.githubUrl || null,
+      featured: insertProject.featured || "false",
       createdAt: new Date()
     };
     this.projects.set(id, project);
@@ -155,8 +163,10 @@ export class MemStorage implements IStorage {
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
     const id = randomUUID();
     const message: ChatMessage = {
-      ...insertMessage,
       id,
+      message: insertMessage.message,
+      response: insertMessage.response,
+      metadata: insertMessage.metadata || null,
       createdAt: new Date()
     };
     this.chatMessages.set(id, message);
