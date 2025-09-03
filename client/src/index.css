@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(120, 60%, 92%);
+  --foreground: hsl(215, 25%, 27%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(215, 25%, 27%);
+  --primary: hsl(37, 91%, 55%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(120, 45%, 85%);
+  --secondary-foreground: hsl(215, 25%, 27%);
+  --muted: hsl(120, 30%, 88%);
+  --muted-foreground: hsl(215, 13%, 52%);
+  --accent: hsl(227, 67%, 58%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(120, 20%, 82%);
+  --input: hsl(120, 20%, 85%);
+  --ring: hsl(227, 67%, 58%);
+  --radius: 8px;
+
+  /* Custom Portfolio Colors */
+  --sage-50: hsl(120, 60%, 98%);
+  --sage-100: hsl(120, 50%, 95%);
+  --sage-200: hsl(120, 45%, 90%);
+  --sage-300: hsl(120, 40%, 85%);
+  --sage-400: hsl(120, 35%, 80%);
+  --sage-500: hsl(124, 35%, 76%);
+  --sage-600: hsl(120, 30%, 65%);
+  --sage-700: hsl(120, 25%, 55%);
+  --sage-800: hsl(120, 20%, 45%);
+  --sage-900: hsl(120, 15%, 35%);
+
+  --warm-orange: hsl(37, 91%, 55%);
+  --warm-orange-50: hsl(48, 100%, 96%);
+  --warm-orange-100: hsl(48, 96%, 89%);
+  --warm-orange-600: hsl(32, 95%, 44%);
+  --warm-orange-700: hsl(26, 90%, 37%);
+
+  --calm-blue: hsl(227, 67%, 58%);
+  --calm-blue-50: hsl(220, 100%, 96%);
+  --calm-blue-100: hsl(221, 91%, 91%);
+  --calm-blue-600: hsl(224, 76%, 48%);
+  --calm-blue-700: hsl(226, 71%, 40%);
+
+  --soft-navy: hsl(215, 25%, 27%);
+  --soft-navy-50: hsl(210, 40%, 98%);
+  --soft-navy-600: hsl(215, 25%, 20%);
+  --soft-navy-700: hsl(222, 47%, 11%);
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Poppins', system-ui, sans-serif;
+  --font-mono: 'Menlo', monospace;
+}
+
+.dark {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(200, 6.6667%, 91.1765%);
+  --card: hsl(228, 9.8039%, 10%);
+  --card-foreground: hsl(0, 0%, 85.0980%);
+  --popover: hsl(0, 0%, 0%);
+  --popover-foreground: hsl(200, 6.6667%, 91.1765%);
+  --primary: hsl(203.7736, 87.6033%, 52.5490%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(195.0000, 15.3846%, 94.9020%);
+  --secondary-foreground: hsl(210, 25%, 7.8431%);
+  --muted: hsl(0, 0%, 9.4118%);
+  --muted-foreground: hsl(210, 3.3898%, 46.2745%);
+  --accent: hsl(205.7143, 70%, 7.8431%);
+  --accent-foreground: hsl(203.7736, 87.6033%, 52.5490%);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(210, 5.2632%, 14.9020%);
+  --input: hsl(207.6923, 27.6596%, 18.4314%);
+  --ring: hsl(202.8169, 89.1213%, 53.1373%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background: linear-gradient(135deg, var(--sage-500) 0%, hsl(124, 30%, 74%) 50%, hsl(124, 25%, 72%) 100%);
+    min-height: 100vh;
+    color: var(--soft-navy);
+  }
+
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components {
+  .gradient-text {
+    background: linear-gradient(135deg, var(--warm-orange), var(--calm-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass-effect {
+    @apply bg-white/20 backdrop-blur-md border border-white/30;
+  }
+
+  .floating-nav {
+    @apply fixed top-1/2 right-7 transform -translate-y-1/2 z-50;
+  }
+
+  .nav-item {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .nav-item:hover {
+    @apply scale-110 -translate-x-2;
+  }
+
+  .project-card {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .project-card:hover {
+    @apply -translate-y-2 scale-105;
+  }
+
+  .scroll-reveal {
+    @apply opacity-0 translate-y-12 transition-all duration-700 ease-out;
+  }
+
+  .scroll-reveal.revealed {
+    @apply opacity-100 translate-y-0;
+  }
+
+  .skill-bar {
+    @apply relative overflow-hidden;
+  }
+
+  .skill-fill {
+    @apply h-full transition-all duration-1000 ease-out;
+    background: linear-gradient(90deg, var(--warm-orange), var(--calm-blue));
+    transform-origin: left;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 2s infinite;
+  }
+
+  .particle {
+    @apply absolute rounded-full opacity-30;
+    background: var(--calm-blue);
+    animation: float 8s linear infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-20px); 
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sage-200);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--calm-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--calm-blue-600);
+}
