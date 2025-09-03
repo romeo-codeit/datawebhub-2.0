@@ -33,19 +33,19 @@ export default function SkillBar({ name, level, delay = 0 }: SkillBarProps) {
     <div ref={skillRef} className="skill-item">
       <div className="flex justify-between mb-2">
         <span 
-          className="text-softNavy font-medium"
+          className="text-cyanPrimary font-medium"
           data-testid={`skill-name-${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
         >
           {name}
         </span>
         <span 
-          className="text-softNavy/70"
+          className="text-cyanPrimary/70"
           data-testid={`skill-level-${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
         >
           {level}%
         </span>
       </div>
-      <div className="skill-bar h-3 bg-gray-200 rounded-full overflow-hidden">
+      <div className="skill-bar h-3 bg-darkPurple-200 rounded-full overflow-hidden">
         <div 
           className="skill-fill rounded-full transition-all duration-1000 ease-out h-full"
           style={{ 

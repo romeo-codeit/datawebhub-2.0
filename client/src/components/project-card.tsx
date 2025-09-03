@@ -16,13 +16,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       />
       <div className="p-6">
         <h3 
-          className="font-heading text-xl font-semibold text-softNavy mb-2"
+          className="font-heading text-xl font-semibold text-cyanPrimary mb-2"
           data-testid={`text-project-title-${project.id}`}
         >
           {project.title}
         </h3>
         <p 
-          className="text-softNavy/70 mb-4 text-sm leading-relaxed"
+          className="text-cyanPrimary/70 mb-4 text-sm leading-relaxed"
           data-testid={`text-project-description-${project.id}`}
         >
           {project.description}
@@ -31,10 +31,10 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         {/* Technologies */}
         <div className="flex flex-wrap gap-2 mb-4">
           {project.technologies.map((tech, index) => {
-            let colorClass = "bg-calmBlue/20 text-calmBlue";
+            let colorClass = "bg-cyanPrimary/20 text-cyanPrimary";
             
-            if (index % 3 === 1) colorClass = "bg-warmOrange/20 text-warmOrange-600";
-            if (index % 3 === 2) colorClass = "bg-green-100 text-green-600";
+            if (index % 3 === 1) colorClass = "bg-purpleAccent/20 text-purpleAccent-600";
+            if (index % 3 === 2) colorClass = "bg-blueAccent/20 text-blueAccent-600";
             
             return (
               <span 
@@ -54,7 +54,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <Button
               variant="link"
               size="sm"
-              className="text-calmBlue hover:text-calmBlue-600 transition-colors p-0 h-auto"
+              className="text-cyanPrimary hover:text-cyanPrimary-600 transition-colors p-0 h-auto"
               asChild
               data-testid={`link-demo-${project.id}`}
             >
@@ -68,7 +68,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <Button
               variant="link"
               size="sm"
-              className="text-softNavy hover:text-softNavy-600 transition-colors p-0 h-auto"
+              className="text-cyanPrimary hover:text-cyanPrimary-600 transition-colors p-0 h-auto"
               asChild
               data-testid={`link-github-${project.id}`}
             >

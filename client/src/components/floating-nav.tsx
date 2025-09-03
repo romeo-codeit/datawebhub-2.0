@@ -31,16 +31,16 @@ export default function FloatingNav() {
                 <button
                   className={`flex items-center justify-center w-12 h-12 rounded-full glass-effect transition-all duration-300 group ${
                     isActive 
-                      ? 'bg-warmOrange/30 border-warmOrange' 
-                      : 'hover:bg-white/30'
+                      ? 'bg-purpleAccent/30 border-purpleAccent' 
+                      : 'hover:bg-cyanPrimary/30'
                   }`}
                   data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
                 >
                   <Icon 
                     className={`w-5 h-5 transition-colors duration-300 ${
                       isActive 
-                        ? 'text-warmOrange' 
-                        : 'text-softNavy group-hover:text-warmOrange'
+                        ? 'text-purpleAccent' 
+                        : 'text-cyanPrimary group-hover:text-purpleAccent'
                     }`} 
                   />
                 </button>
@@ -48,9 +48,9 @@ export default function FloatingNav() {
               
               {/* Underline */}
               {hoveredItem === item.href && (
-                <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-softNavy text-white px-3 py-1 rounded-lg text-sm whitespace-nowrap opacity-0 animate-fade-in">
+                <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-darkPurple text-cyanPrimary px-3 py-1 rounded-lg text-sm whitespace-nowrap opacity-0 animate-fade-in">
                   {item.label}
-                  <div className="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-softNavy border-y-4 border-y-transparent"></div>
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-darkPurple border-y-4 border-y-transparent"></div>
                 </div>
               )}
             </div>

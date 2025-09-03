@@ -70,13 +70,13 @@ export default function Chat() {
   };
 
   return (
-    <section id="chat" className="py-20 bg-white/20 min-h-screen">
+    <section id="chat" className="py-20 bg-darkPurple/20 min-h-screen">
       <div className="container mx-auto px-6 lg:px-12 max-w-7xl">
         <div className="text-center mb-16 scroll-reveal">
-          <h2 className="font-heading text-4xl lg:text-5xl font-bold text-softNavy mb-6">
+          <h2 className="font-heading text-4xl lg:text-5xl font-bold text-cyanPrimary mb-6">
             AI <span className="gradient-text">Chat</span>
           </h2>
-          <p className="text-xl text-softNavy/70 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-cyanPrimary/70 max-w-3xl mx-auto leading-relaxed">
             Chat with my AI assistant powered by advanced language models. Ask about my work, skills, or anything else!
           </p>
         </div>
@@ -85,7 +85,7 @@ export default function Chat() {
           <div className="glass-effect rounded-3xl overflow-hidden">
             <div className="grid lg:grid-cols-5 gap-0 min-h-[600px]">
               {/* Avatar Section */}
-              <div className="lg:col-span-2 bg-gradient-to-br from-calmBlue/20 to-warmOrange/20 flex items-center justify-center p-8">
+              <div className="lg:col-span-2 bg-gradient-to-br from-cyanPrimary/20 to-purpleAccent/20 flex items-center justify-center p-8">
                 <AvatarPlaceholder 
                   animation={avatarAnimation}
                   onAnimationChange={setAvatarAnimation}
@@ -108,14 +108,14 @@ export default function Chat() {
                       placeholder="Ask me anything about Alex..." 
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-calmBlue focus:border-transparent"
+                      className="flex-1 px-4 py-3 rounded-xl border border-darkPurple-200 focus:outline-none focus:ring-2 focus:ring-cyanPrimary focus:border-transparent bg-darkPurple-300 text-cyanPrimary"
                       disabled={isLoading}
                       data-testid="input-chat-message"
                     />
                     <Button 
                       type="submit" 
                       disabled={!message.trim() || isLoading}
-                      className="bg-calmBlue hover:bg-calmBlue-600 text-white px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-purpleAccent hover:bg-purpleAccent-600 text-white px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                       data-testid="button-send-message"
                     >
                       {isLoading ? (
@@ -138,7 +138,7 @@ export default function Chat() {
                         onClick={() => handleQuickAction(action.key)}
                         variant="secondary"
                         size="sm"
-                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-xs text-softNavy transition-all"
+                        className="px-3 py-1 bg-darkPurple-200 hover:bg-darkPurple-300 rounded-full text-xs text-cyanPrimary transition-all"
                         data-testid={`quick-action-${action.key}`}
                       >
                         {action.label}
