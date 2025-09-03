@@ -31,22 +31,22 @@ export default function About() {
               <Avatar className="w-48 h-48 mx-auto mb-6 border-4 border-white shadow-xl">
                 {/* Avatar image should be provided via environment variable or API */}
                 <AvatarImage 
-                  src={import.meta.env.VITE_USER_AVATAR || ""} 
+                  src={(import.meta.env.VITE_USER_AVATAR) || ""} 
                   alt="Profile photo" 
                 />
                 <AvatarFallback>AJ</AvatarFallback>
               </Avatar>
               <h3 className="font-heading text-2xl font-semibold text-cyanPrimary mb-2" data-testid="text-name">
                 {/* Name should be provided via environment variable */}
-                {import.meta.env.VITE_USER_NAME || "Your Name"}
+                {(import.meta.env.VITE_USER_NAME) || "Your Name"}
               </h3>
               <p className="text-purpleAccent font-medium mb-4" data-testid="text-title">
                 {/* Title should be provided via environment variable */}
-                {import.meta.env.VITE_USER_TITLE || "Your Title"}
+                {(import.meta.env.VITE_USER_TITLE) || "Your Professional Title"}
               </p>
               <p className="text-cyanPrimary/70 text-sm leading-relaxed" data-testid="text-bio">
                 {/* Bio should be provided via environment variable */}
-                {import.meta.env.VITE_USER_BIO || "Your professional bio goes here."}
+                {(import.meta.env.VITE_USER_BIO) || "Add your professional bio via the VITE_USER_BIO environment variable."}
               </p>
             </div>
           </div>
