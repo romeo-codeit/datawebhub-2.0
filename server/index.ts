@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import os from "node:os";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
@@ -64,7 +65,8 @@ app.use((req, res, next) => {
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
+    // The reusePort option is not supported on Windows
+    reusePort: os.platform() !== "win32",
   }, () => {
     log(`serving on port ${port}`);
   });
