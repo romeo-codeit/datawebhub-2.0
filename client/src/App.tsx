@@ -12,11 +12,13 @@ import Chat from "@/pages/chat";
 import LoginPage from "@/pages/admin/login";
 import DashboardPage from "@/pages/admin/dashboard";
 import FloatingNav from "@/components/floating-nav";
+import BottomTabBar from "@/components/bottom-tab-bar";
 
 function Router() {
   return (
     <>
       <FloatingNav />
+      <BottomTabBar />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />

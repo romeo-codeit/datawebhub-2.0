@@ -14,7 +14,7 @@ export default function FloatingNav() {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   return (
-    <nav className="floating-nav">
+    <nav className="floating-nav hidden md:flex">
       <div className="flex flex-col space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
