@@ -45,10 +45,10 @@ const Model = forwardRef((props, ref) => {
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
-      const scale = 2.5 / maxDim;
+      const scale = 2.8 / maxDim;
 
       scene.scale.set(scale, scale, scale);
-      scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+      scene.position.set(-center.x * scale, -center.y * scale + 0.2, -center.z * scale);
     }
   }, [scene])
 
