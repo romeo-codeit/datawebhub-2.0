@@ -50,7 +50,7 @@ export default function Chat() {
         <div className="max-w-6xl mx-auto">
           <div className="bg-card border rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row h-[85vh]">
             {/* Avatar Section */}
-            <div className="md:w-2/5 bg-secondary border-b md:border-b-0 md:border-r h-64 md:h-auto">
+            <div className="md:w-2/5 bg-secondary border-b md:border-b-0 md:border-r h-96 md:h-auto">
               <Avatar3D ref={modelRef} />
             </div>
 
