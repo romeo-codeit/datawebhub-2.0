@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Loader2 } from "lucide-react";
@@ -8,6 +8,7 @@ import Avatar3D from "@/components/avatar-3d";
 
 export default function Chat() {
   const [message, setMessage] = useState("");
+  const modelRef = useRef();
   
   const { 
     messages, 
@@ -22,6 +23,10 @@ export default function Chat() {
 
     const userMessage = message.trim();
     setMessage("");
+
+    if (modelRef.current) {
+      modelRef.current.playAnimation('talk');
+    }
     
     try {
       await sendMessage(userMessage);
@@ -46,7 +51,7 @@ export default function Chat() {
           <div className="bg-card border rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row h-[85vh]">
             {/* Avatar Section */}
             <div className="md:w-2/5 bg-secondary border-b md:border-b-0 md:border-r h-64 md:h-auto">
-              <Avatar3D />
+              <Avatar3D ref={modelRef} />
             </div>
 
             {/* Chat Section */}
