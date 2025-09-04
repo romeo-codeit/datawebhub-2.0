@@ -19,7 +19,7 @@
   --primary: hsl(175, 70%, 45%); /* Vibrant Teal */
   --primary-foreground: hsl(210, 10%, 15%);
 
-  --secondary: hsl(0, 0%, 95%); /* Off-white */
+  --secondary: hsl(210, 10%, 23%); /* Darker background for avatar */
   --secondary-foreground: hsl(210, 10%, 15%);
 
   --muted: hsl(210, 10%, 25%);
@@ -144,5 +144,38 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@layer components {
+  @media (max-width: 640px) {
+    [data-testid="chat-messages"] .max-w-md {
+      max-width: 100%;
+    }
+
+    [data-testid="chat-messages"] .px-4 {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    [data-testid="chat-messages"] .py-3 {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    [data-testid="chat-messages"] p {
+      font-size: 0.875rem; /* 14px */
+      line-height: 1.25rem; /* 20px */
+    }
+
+    [data-testid="input-chat-message"] {
+      height: 2.5rem; /* 40px */
+      font-size: 0.875rem;
+    }
+
+    [data-testid="button-send-message"] {
+      height: 2.5rem;
+      width: 2.5rem;
+    }
   }
 }
