@@ -1,31 +1,30 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/project-card";
+import { useProjects } from "@/hooks/use-projects";
 import { useScrollReveal } from "@/lib/animations";
 import { Loader2, Plus } from "lucide-react";
 
 type FilterType = 'all' | 'web' | 'mobile' | 'design';
 
-// Dummy data for projects
+// NOTE: This is fallback data for demonstration purposes.
+// In a real application, this data would be fetched from the API.
 const allProjects = [
-  { id: 1, title: "E-commerce Platform", description: "A full-featured e-commerce site with a modern UI.", imageUrl: "/placeholder.svg", tags: ["web", "design"], category: "web" },
-  { id: 2, title: "Task Management App", description: "A mobile-first task management application.", imageUrl: "/placeholder.svg", tags: ["mobile"], category: "mobile" },
-  { id: 3, title: "Portfolio Website", description: "A personal portfolio to showcase my work.", imageUrl: "/placeholder.svg", tags: ["web", "design"], category: "web" },
-  { id: 4, title: "Design System", description: "A comprehensive design system for a large-scale application.", imageUrl: "/placeholder.svg", tags: ["design"], category: "design" },
-  { id: 5, title: "Social Media App", description: "A concept for a new social media platform.", imageUrl: "/placeholder.svg", tags: ["mobile", "design"], category: "mobile" },
-  { id: 6, title: "Data Visualization Tool", description: "A tool for visualizing complex data sets.", imageUrl: "/placeholder.svg", tags: ["web"], category: "web" },
+  { id: 1, title: "E-commerce Platform", description: "A full-featured e-commerce site with a modern UI.", imageUrl: "/placeholder.svg", technologies: ["React", "Node.js", "TypeScript"], category: "web", demoUrl: "#", githubUrl: "#" },
+  { id: 2, title: "Task Management App", description: "A mobile-first task management application designed for productivity.", imageUrl: "/placeholder.svg", technologies: ["React Native", "Firebase"], category: "mobile", demoUrl: "#", githubUrl: "#" },
+  { id: 3, title: "Portfolio Website", description: "A personal portfolio to showcase my work and skills.", imageUrl: "/placeholder.svg", technologies: ["Next.js", "Tailwind CSS"], category: "web", demoUrl: "#", githubUrl: "#" },
+  { id: 4, title: "Design System", description: "A comprehensive design system for a large-scale application.", imageUrl: "/placeholder.svg", technologies: ["Figma", "Storybook"], category: "design", demoUrl: "#", githubUrl: "#" },
+  { id: 5, title: "Social Media App", description: "A concept for a new social media platform with a unique twist.", imageUrl: "/placeholder.svg", technologies: ["SwiftUI", "GraphQL"], category: "mobile", demoUrl: "#", githubUrl: "#" },
+  { id: 6, title: "Data Visualization Tool", description: "A tool for visualizing complex data sets in an intuitive way.", imageUrl: "/placeholder.svg", technologies: ["D3.js", "React"], category: "web", demoUrl: "#", githubUrl: "#" },
 ];
 
 export default function Projects() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [isLoading, setIsLoading] = useState(false); // Mock loading state
+  const { data: projectsFromApi, isLoading, error } = useProjects(activeFilter);
   
   useScrollReveal();
 
-  const filteredProjects = useMemo(() => {
-    if (activeFilter === 'all') return allProjects;
-    return allProjects.filter(p => p.category === activeFilter);
-  }, [activeFilter]);
+  const projects = projectsFromApi && projectsFromApi.length > 0 ? projectsFromApi : allProjects;
 
   const filters: { key: FilterType; label: string }[] = [
     { key: 'all', label: 'All Projects' },
@@ -68,15 +67,20 @@ export default function Projects() {
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-10 h-10 animate-spin text-primary" />
           </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <h3 className="text-2xl font-bold text-destructive mb-4">Failed to load projects</h3>
+            <p className="text-muted-foreground">{error.message}</p>
+          </div>
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-              {filteredProjects.map((project) => (
+              {projects?.map((project) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>
             
-            {filteredProjects.length === 0 && (
+            {projects?.length === 0 && (
               <div className="text-center py-20">
                 <h3 className="text-2xl font-bold text-foreground mb-4">No projects found</h3>
                 <p className="text-muted-foreground">

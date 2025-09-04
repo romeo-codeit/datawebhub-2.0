@@ -7,7 +7,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const { title, description, imageUrl, tags = [], demoUrl, githubUrl, id } = project;
+  const { title, description, imageUrl, technologies = [], demoUrl, githubUrl, id } = project;
 
   return (
     <div className="project-card bg-card rounded-2xl overflow-hidden scroll-reveal border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -32,13 +32,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         
         {/* Technologies */}
         <div className="flex flex-wrap gap-2 mb-6">
-          {tags.map((tag) => (
+          {technologies.map((tech) => (
             <span
-              key={tag}
+              key={tech}
               className="px-3 py-1 text-sm rounded-full bg-secondary text-secondary-foreground"
-              data-testid={`tech-${tag.toLowerCase()}-${id}`}
+              data-testid={`tech-${tech.toLowerCase()}-${id}`}
             >
-              {tag}
+              {tech}
             </span>
           ))}
         </div>

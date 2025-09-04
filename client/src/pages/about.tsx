@@ -5,19 +5,40 @@ import { useScrollReveal } from "@/lib/animations";
 export default function About() {
   useScrollReveal();
 
-  // Skills should be fetched from API in production
+  // NOTE: This is placeholder data for demonstration purposes.
+  // In a real application, this data would likely be fetched from an API.
   const skills: Array<{name: string, level: number}> = [
     { name: "React & Next.js", level: 95 },
     { name: "Node.js & Express", level: 90 },
-    { name: "TypeScript", level: 90 },
-    { name: "Tailwind CSS", level: 98 },
-    { name: "Figma & UI Design", level: 85 },
+    { name: "TypeScript", level: 92 },
+    { name: "GraphQL & Apollo", level: 85 },
+    { name: "Docker & Kubernetes", level: 75 },
+    { name: "Figma & UI Design", level: 88 },
   ];
 
   // Experiences should be fetched from API in production
   const experiences: Array<{title: string, company: string, period: string, description: string, color: string}> = [
-    { title: "Senior Frontend Developer", company: "Innovate Inc.", period: "2021 - Present", description: "Leading the development of a new design system and component library.", color: "primary" },
-    { title: "Full-Stack Developer", company: "Tech Solutions", period: "2018 - 2021", description: "Built and maintained scalable web applications for various clients.", color: "accent" },
+    {
+      title: "Senior Frontend Developer",
+      company: "Innovate Inc.",
+      period: "2021 - Present",
+      description: "Leading the development of a new design system and component library from the ground up, resulting in a 40% increase in development velocity. Collaborating with product and design teams to create elegant and intuitive user interfaces.",
+      color: "primary"
+    },
+    {
+      title: "Full-Stack Developer",
+      company: "Tech Solutions",
+      period: "2018 - 2021",
+      description: "Built and maintained scalable web applications for a diverse range of clients using React, Node.js, and PostgreSQL. Contributed to all phases of the development lifecycle, from concept to deployment.",
+      color: "accent"
+    },
+    {
+      title: "Junior Web Developer",
+      company: "Digital Creations",
+      period: "2016 - 2018",
+      description: "Assisted in the development and maintenance of client websites, primarily using HTML, CSS, and JavaScript. Gained foundational experience in version control with Git and agile methodologies.",
+      color: "primary"
+    }
   ];
 
   return (

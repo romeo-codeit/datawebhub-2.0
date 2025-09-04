@@ -7,69 +7,69 @@
   --font-heading: 'Poppins', sans-serif;
   --font-mono: 'Menlo', monospace;
 
-  --background: hsl(270, 20%, 98%); /* Light variant of secondary for background */
-  --foreground: hsl(270, 20%, 25%); /* Darker plum for text */
+  --background: hsl(48, 50%, 95%);
+  --foreground: hsl(98, 21%, 30%);
 
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(270, 20%, 25%);
+  --card-foreground: hsl(98, 21%, 30%);
 
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(270, 20%, 25%);
+  --popover-foreground: hsl(98, 21%, 30%);
 
-  --primary: hsl(270, 20%, 37%); /* Deep Plum */
-  --primary-foreground: hsl(26, 25%, 95%); /* Lighter beige for text on primary */
+  --primary: hsl(206, 41%, 81%); /* Pastel Blue */
+  --primary-foreground: hsl(98, 21%, 30%);
 
-  --secondary: hsl(26, 25%, 80%); /* Soft Beige */
-  --secondary-foreground: hsl(270, 20%, 37%); /* Deep plum for text on secondary */
+  --secondary: hsl(98, 21%, 30%); /* Forest Green */
+  --secondary-foreground: hsl(48, 44%, 89%);
 
-  --muted: hsl(26, 25%, 90%);
-  --muted-foreground: hsl(270, 20%, 45%);
+  --muted: hsl(48, 44%, 89%);
+  --muted-foreground: hsl(98, 21%, 40%);
 
-  --accent: hsl(43, 40%, 63%); /* Muted Gold */
-  --accent-foreground: hsl(270, 20%, 25%);
+  --accent: hsl(15, 43%, 74%); /* Soft Terracotta */
+  --accent-foreground: hsl(98, 21%, 30%);
 
   --destructive: hsl(0, 70%, 50%);
   --destructive-foreground: hsl(0, 0%, 100%);
 
-  --border: hsl(26, 25%, 85%);
-  --input: hsl(26, 25%, 95%);
-  --ring: hsl(270, 20%, 37%);
+  --border: hsl(48, 44%, 85%);
+  --input: hsl(48, 44%, 93%);
+  --ring: hsl(98, 21%, 30%);
 
   --radius: 0.75rem;
 
   /* Additional Accent Colors */
-  --accent-sage: hsl(112, 10%, 67%);
-  --accent-navy: hsl(218, 22%, 37%);
+  --accent-cream: hsl(48, 44%, 89%);
+  --accent-terracotta: hsl(15, 43%, 74%);
 }
 
 .dark {
-  --background: hsl(270, 20%, 10%);
-  --foreground: hsl(26, 25%, 80%);
+  --background: hsl(98, 15%, 10%);
+  --foreground: hsl(48, 44%, 89%);
 
-  --card: hsl(270, 20%, 15%);
-  --card-foreground: hsl(26, 25%, 80%);
+  --card: hsl(98, 15%, 15%);
+  --card-foreground: hsl(48, 44%, 89%);
 
-  --popover: hsl(270, 20%, 10%);
-  --popover-foreground: hsl(26, 25%, 80%);
+  --popover: hsl(98, 15%, 10%);
+  --popover-foreground: hsl(48, 44%, 89%);
 
-  --primary: hsl(26, 25%, 80%); /* Soft Beige for primary in dark mode */
-  --primary-foreground: hsl(270, 20%, 15%);
+  --primary: hsl(206, 41%, 81%); /* Pastel Blue */
+  --primary-foreground: hsl(98, 15%, 10%);
 
-  --secondary: hsl(270, 20%, 37%); /* Deep Plum for secondary in dark mode */
-  --secondary-foreground: hsl(26, 25%, 95%);
+  --secondary: hsl(48, 44%, 89%); /* Light Cream */
+  --secondary-foreground: hsl(98, 15%, 10%);
 
-  --muted: hsl(270, 20%, 20%);
-  --muted-foreground: hsl(26, 25%, 70%);
+  --muted: hsl(98, 15%, 20%);
+  --muted-foreground: hsl(48, 44%, 70%);
 
-  --accent: hsl(43, 40%, 63%); /* Muted Gold */
-  --accent-foreground: hsl(270, 20%, 15%);
+  --accent: hsl(15, 43%, 74%); /* Soft Terracotta */
+  --accent-foreground: hsl(98, 15%, 10%);
 
   --destructive: hsl(0, 60%, 50%);
   --destructive-foreground: hsl(0, 0%, 100%);
 
-  --border: hsl(270, 20%, 25%);
-  --input: hsl(270, 20%, 22%);
-  --ring: hsl(43, 40%, 63%);
+  --border: hsl(98, 15%, 25%);
+  --input: hsl(98, 15%, 22%);
+  --ring: hsl(206, 41%, 81%);
 }
 
 @layer base {
@@ -120,7 +120,7 @@
   }
 
   .scroll-reveal {
-    @apply opacity-0 translate-y-12 transition-all duration-700 ease-out;
+    @apply opacity-0 translate-y-20 scale-95 transition-all duration-700 ease-out;
   }
 
   .scroll-reveal.revealed {
