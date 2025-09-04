@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { useGLTF, OrbitControls, useAnimations } from '@react-three/drei'
+import { useGLTF, OrbitControls, useAnimations, Loader } from '@react-three/drei'
 import { Suspense, useLayoutEffect, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import * as THREE from 'three'
 
@@ -67,13 +67,14 @@ export default function Avatar3D() {
   }
 
   return (
-    <Canvas dpr={[1, 2]} camera={{ fov: 50, position: [0, 1, 4] }} shadows>
-      <color attach="background" args={['#f0f0f0']} />
-      <Suspense fallback={null}>
-        <ambientLight intensity={0.2} />
+    <>
+      <Canvas dpr={[1, 2]} camera={{ fov: 50, position: [0, 1, 3] }} shadows>
+        <color attach="background" args={['#d0d0d0']} />
+        <Suspense fallback={null}>
+        <ambientLight intensity={0.5} />
         <directionalLight
           position={[3, 3, 3]}
-          intensity={1.5}
+          intensity={2.0}
           color="#FFDDBB"
           castShadow
           shadow-mapSize-width={2048}
@@ -82,10 +83,10 @@ export default function Avatar3D() {
         />
         <directionalLight
           position={[-3, 3, -3]}
-          intensity={0.8}
+          intensity={1.0}
           color="#BBDDFF"
         />
-        <hemisphereLight groundColor="#000000" skyColor="#ffffff" intensity={0.5} />
+        <hemisphereLight groundColor="#000000" skyColor="#ffffff" intensity={0.8} />
         <Model ref={modelRef} />
       </Suspense>
       <OrbitControls
@@ -95,6 +96,8 @@ export default function Avatar3D() {
         enablePan={false}
       />
     </Canvas>
+      <Loader />
+    </>
   )
 }
 
