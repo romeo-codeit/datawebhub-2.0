@@ -1,6 +1,7 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useScrollReveal } from "@/lib/animations";
 import { Briefcase, Code, Star } from "lucide-react";
+import PageHeader from "@/components/page-header";
 
 export default function About() {
   useScrollReveal();
@@ -35,19 +36,14 @@ export default function About() {
   ];
 
   return (
-    <section id="about" className="py-24 sm:py-32 bg-background">
-      <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
-        <div className="text-center mb-20 scroll-reveal">
-          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground mb-4">
-            About <span className="text-primary">Me</span>
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            I'm a passionate full-stack developer with expertise in modern web technologies, 
-            creating exceptional digital experiences that combine functionality with stunning design.
-          </p>
-        </div>
-        
-        <div className="grid lg:grid-cols-3 gap-16 items-start">
+    <>
+      <PageHeader
+        title={<>About <span className="text-primary">Me</span></>}
+        subtitle="I'm a passionate full-stack developer with expertise in modern web technologies, creating exceptional digital experiences that combine functionality with stunning design."
+      />
+      <section id="about-content" className="py-24 sm:py-32 bg-background">
+        <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
+          <div className="grid lg:grid-cols-3 gap-16 items-start">
           {/* Left Column: Profile */}
           <div className="lg:col-span-1 space-y-8 scroll-reveal sticky top-24">
             <Avatar className="w-48 h-48 mx-auto border-4 border-primary shadow-xl">
@@ -107,5 +103,6 @@ export default function About() {
         </div>
       </div>
     </section>
+    </>
   );
 }

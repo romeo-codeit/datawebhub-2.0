@@ -4,6 +4,7 @@ import ProjectCard from "@/components/project-card";
 import { useProjects } from "@/hooks/use-projects";
 import { useScrollReveal } from "@/lib/animations";
 import { Loader2, Plus } from "lucide-react";
+import PageHeader from "@/components/page-header";
 
 type FilterType = 'all' | 'web' | 'mobile' | 'design';
 
@@ -21,19 +22,15 @@ export default function Projects() {
   ];
 
   return (
-    <section id="projects" className="py-24 sm:py-32 bg-background min-h-screen">
-      <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
-        <div className="text-center mb-20 scroll-reveal">
-          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground mb-4">
-            Featured <span className="text-primary">Projects</span>
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            A showcase of my latest work, featuring innovative solutions and cutting-edge technologies.
-          </p>
-        </div>
-        
-        {/* Project Filters */}
-        <div className="flex justify-center mb-16 scroll-reveal">
+    <>
+      <PageHeader
+        title={<>Featured <span className="text-primary">Projects</span></>}
+        subtitle="A showcase of my latest work, featuring innovative solutions and cutting-edge technologies."
+      />
+      <section id="projects-content" className="py-24 sm:py-32 bg-background">
+        <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
+          {/* Project Filters */}
+          <div className="flex justify-center mb-16 scroll-reveal">
           <div className="bg-card border rounded-xl p-2 flex gap-2 flex-wrap shadow-sm">
             {filters.map((filter) => (
               <Button
@@ -92,5 +89,6 @@ export default function Projects() {
         )}
       </div>
     </section>
+    </>
   );
 }
