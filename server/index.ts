@@ -1,9 +1,12 @@
 import { config } from 'dotenv';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Load environment variables from .env file in the project root
-// When npm run dev is executed from the root, process.cwd() is the root.
-// So, './.env' correctly points to the .env file in the root.
-config({ path: resolve(process.cwd(), './.env') });
+config({ path: resolve(__dirname, '../.env') });
 
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
