@@ -68,12 +68,12 @@ export default function Avatar3D() {
 
   return (
     <>
-      <Canvas dpr={[1, 2]} camera={{ fov: 45, position: [0, 0.7, 2.2] }} shadows>
+      <Canvas dpr={[1, 2]} camera={{ fov: 45, position: [0, 0.9, 2.2] }} shadows>
         <Suspense fallback={null}>
-        <ambientLight intensity={1.0} />
+        <ambientLight intensity={1.2} />
         <directionalLight
           position={[3, 3, 3]}
-          intensity={3.0}
+          intensity={3.5}
           color="#FFDDBB"
           castShadow
           shadow-mapSize-width={2048}
@@ -82,16 +82,17 @@ export default function Avatar3D() {
         />
         <directionalLight
           position={[-3, 3, -3]}
-          intensity={2.0}
+          intensity={2.5}
           color="#BBDDFF"
         />
-        <hemisphereLight groundColor="#000000" skyColor="#ffffff" intensity={1.2} />
+        <hemisphereLight groundColor="#000000" skyColor="#ffffff" intensity={1.5} />
         <Model ref={modelRef} />
       </Suspense>
       <OrbitControls
-        target={[0, 1.2, 0]}
+        target={[0, 1.4, 0]}
         enableZoom={false}
         enablePan={false}
+        enabled={false}
       />
     </Canvas>
       <Loader />
