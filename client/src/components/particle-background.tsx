@@ -89,7 +89,6 @@ const ParticleBackground = () => {
         id="tsparticles"
         particlesLoaded={particlesLoaded}
         options={options}
-        className="absolute inset-0 z-0"
       />
     );
   }
