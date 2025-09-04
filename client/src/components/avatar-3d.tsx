@@ -48,7 +48,8 @@ const Model = forwardRef((props, ref) => {
       const scale = 2.8 / maxDim;
 
       scene.scale.set(scale, scale, scale);
-      scene.position.set(-center.x * scale, -center.y * scale + 0.2, -center.z * scale);
+      // Move the model down by 0.6 units to create a waist-up cutoff
+      scene.position.set(-center.x * scale, -center.y * scale - 0.6, -center.z * scale);
     }
   }, [scene])
 
@@ -68,7 +69,7 @@ export default function Avatar3D() {
 
   return (
     <>
-      <Canvas dpr={[1, 2]} camera={{ fov: 45, position: [0, 0.9, 2.2] }} shadows>
+      <Canvas dpr={[1, 2]} camera={{ fov: 45, position: [0, 0.6, 2.2] }} shadows>
         <Suspense fallback={null}>
         <ambientLight intensity={1.2} />
         <directionalLight
@@ -89,7 +90,7 @@ export default function Avatar3D() {
         <Model ref={modelRef} />
       </Suspense>
       <OrbitControls
-        target={[0, 1.4, 0]}
+        target={[0, 0.6, 0]}
         enableZoom={false}
         enablePan={false}
         enabled={false}
