@@ -1,59 +1,60 @@
-import { Canvas } from '@react-three/fiber'
-import { useGLTF, OrbitControls, useAnimations, Loader } from '@react-three/drei'
-import { Suspense, useLayoutEffect, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useGLTF, OrbitControls, Loader } from '@react-three/drei'
+import { Suspense, useRef, useEffect, forwardRef } from 'react'
 import * as THREE from 'three'
 
 const Model = forwardRef((props, ref) => {
   const group = useRef()
-  const { scene, animations } = useGLTF('/src/assets/my-avatar-.glb')
-  const { actions, mixer } = useAnimations(animations, group)
+  const { scene } = useGLTF('/src/assets/my-avatar-.glb')
+  const headMesh = useRef();
 
   useEffect(() => {
-    actions.idle.play();
-  }, [actions]);
+    const head = scene.getObjectByName('AvatarHead');
+    if (head && head.isSkinnedMesh) {
+        console.log('Found head mesh by name "AvatarHead":', head);
+        headMesh.current = head;
+    } else {
+        console.log('Head mesh with name "AvatarHead" not found. Falling back to first skinned mesh.');
+        scene.traverse((obj) => {
+            if (obj.isSkinnedMesh && obj.morphTargetDictionary) {
+                if (!headMesh.current) {
+                    console.log('Using first skinned mesh with morph targets:', obj);
+                    headMesh.current = obj;
+                }
+            }
+        });
+    }
+  }, [scene]);
 
-  useImperativeHandle(ref, () => ({
-    playAnimation: (name) => {
-      if (!actions[name]) return;
+  useFrame(() => {
+    if (headMesh.current) {
+      const jawOpenIndex = headMesh.current.morphTargetDictionary['jawOpen'];
 
-      const from = actions.idle;
-      const to = actions[name];
-
-      from.reset().crossFadeTo(to, 0.3, true).play();
-
-      if (name !== 'idle') {
-        to.clampWhenFinished = true;
-        to.loop = THREE.LoopOnce;
-
-        const onFinished = () => {
-          to.crossFadeTo(from.reset(), 0.3, true).play();
-          mixer.removeEventListener('finished', onFinished);
-        }
-        mixer.addEventListener('finished', onFinished);
+      if (jawOpenIndex !== undefined) {
+        headMesh.current.morphTargetInfluences[jawOpenIndex] = 1;
       }
     }
-  }));
+  });
 
-  useLayoutEffect(() => {
+  // We only need an effect to ensure all meshes in the model can cast shadows.
+  // The positioning and scaling is now handled declaratively in the JSX below.
+  useEffect(() => {
     scene.traverse((obj) => {
       if (obj.isMesh) {
         obj.castShadow = true;
       }
     });
-    if (scene) {
-      const box = new THREE.Box3().setFromObject(scene);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const scale = 2.8 / maxDim;
+  }, [scene]);
 
-      scene.scale.set(scale, scale, scale);
-      // Move the model down by 0.6 units to create a waist-up cutoff
-      scene.position.set(-center.x * scale, -center.y * scale - 0.6, -center.z * scale);
-    }
-  }, [scene])
-
-  return <primitive object={scene} {...props} ref={group} />
+  // By wrapping the model in a group and applying transformations here,
+  // we ensure the position is fixed and doesn't shift on page navigation.
+  // The y-position is negative to move the model down, creating the waist-up cutoff.
+  // You may need to tweak `position` and `scale` to perfectly frame your avatar.
+  return (
+    <group {...props} position={[0, -1.7, 0]} scale={1.2}>
+      <primitive object={scene} ref={group} />
+    </group>
+  );
 })
 
 export default function Avatar3D() {
@@ -62,14 +63,21 @@ export default function Avatar3D() {
   // Example of how to call playAnimation from the parent component
   // This would be triggered by an event, e.g., when the AI starts speaking.
   const handlePlayTalkAnimation = () => {
-    if (modelRef.current) {
-      modelRef.current.playAnimation('talk');
-    }
+    // This will not work now as useImperativeHandle is removed
+    // if (modelRef.current) {
+    //   modelRef.current.playAnimation('talk');
+    // }
   }
 
   return (
     <>
-      <Canvas dpr={[1, 2]} camera={{ fov: 45, position: [0, 0.6, 2.2] }} shadows>
+      {/*
+        By setting a fixed camera position and FOV, we ensure the framing is always consistent.
+        - `position` is [x, y, z]. A `y` of 0.2 looks slightly down at the model.
+        - `fov` (field of view) acts like zoom. A smaller `fov` is more zoomed in.
+        - `gl={{ preserveDrawingBuffer: true }}` can help prevent flickering on route changes.
+      */}
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true }}>
         <Suspense fallback={null}>
         <ambientLight intensity={1.2} />
         <directionalLight
@@ -90,7 +98,8 @@ export default function Avatar3D() {
         <Model ref={modelRef} />
       </Suspense>
       <OrbitControls
-        target={[0, 0.6, 0]}
+        // The target is now lowered to better frame the upper body
+        target={[0, 0.2, 0]}
         enableZoom={false}
         enablePan={false}
         enabled={false}
