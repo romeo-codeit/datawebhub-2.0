@@ -20,13 +20,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       />
       <div className="p-6">
         <h3 
-          className="font-heading text-xl font-bold text-card-foreground mb-2"
+          className="font-heading text-lg md:text-xl font-bold text-card-foreground mb-2"
           data-testid={`text-project-title-${id}`}
         >
           {title}
         </h3>
         <p 
-          className="text-muted-foreground mb-4 text-base leading-relaxed"
+          className="text-muted-foreground mb-4 text-sm md:text-base leading-relaxed"
           data-testid={`text-project-description-${id}`}
         >
           {description}

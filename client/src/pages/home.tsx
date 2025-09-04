@@ -17,7 +17,7 @@ export default function Home() {
         <ParticleBackground />
         <div className="container mx-auto px-6 lg:px-8 max-w-7xl relative z-10">
           <div className="text-center scroll-reveal">
-            <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tighter mb-8">
+            <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tighter mb-6 md:mb-8">
               <span className="block text-foreground">
                 Hello, I'm Romeo.
               </span>
@@ -46,7 +46,7 @@ export default function Home() {
               </Link>
             </div>
             
-            <div className="flex gap-4 pt-12 justify-center">
+            <div className="flex gap-4 pt-8 md:pt-12 justify-center">
               {(import.meta.env.VITE_GITHUB_URL) && (
                 <a href={import.meta.env.VITE_GITHUB_URL} className="text-muted-foreground hover:text-primary transition-colors" target="_blank" rel="noopener noreferrer">
                   <Github className="w-7 h-7" />

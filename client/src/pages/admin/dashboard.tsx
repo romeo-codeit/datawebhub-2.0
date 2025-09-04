@@ -80,7 +80,7 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
         </div>
-        <div className="bg-card p-8 rounded-2xl shadow-lg border">
+        <div className="bg-card p-4 md:p-8 rounded-2xl shadow-lg border">
           <h2 className="text-2xl font-bold text-card-foreground mb-6">
             Upload New Project
           </h2>

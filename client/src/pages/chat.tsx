@@ -55,7 +55,7 @@ export default function Chat() {
         
         <div className="max-w-5xl mx-auto">
           <div className="bg-card border rounded-2xl shadow-lg overflow-hidden">
-            <div className="grid lg:grid-cols-5 gap-0 min-h-[70vh]">
+            <div className="grid lg:grid-cols-5 gap-0 min-h-[80vh] lg:min-h-[70vh]">
               {/* Avatar Section */}
               <div className="lg:col-span-2 bg-secondary flex items-center justify-center p-8 border-r">
                 <AvatarPlaceholder 

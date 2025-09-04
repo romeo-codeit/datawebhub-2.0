@@ -45,7 +45,7 @@ export default function About() {
         <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
           <div className="grid lg:grid-cols-3 gap-16 items-start">
           {/* Left Column: Profile */}
-          <div className="lg:col-span-1 space-y-8 scroll-reveal sticky top-24">
+          <div className="lg:col-span-1 space-y-8 scroll-reveal lg:sticky top-24">
             <Avatar className="w-48 h-48 mx-auto border-4 border-primary shadow-xl">
               <AvatarImage src={(import.meta.env.VITE_USER_AVATAR) || ""} alt="Profile photo" />
               <AvatarFallback>AJ</AvatarFallback>
