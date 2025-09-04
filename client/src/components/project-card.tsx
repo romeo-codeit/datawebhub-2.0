@@ -1,4 +1,4 @@
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Project } from "@shared/schema";
 import { Link } from "wouter";
@@ -8,7 +8,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const { title, description, imageUrl, technologies = [], demoUrl, githubUrl, id } = project;
+  const { title, description, imageUrl, technologies = [], demoUrl, id } = project;
 
   return (
     <Link href={`/projects/${id}`} className="block">
@@ -57,19 +57,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               <a href={demoUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Live Demo
-              </a>
-            </Button>
-          )}
-          {githubUrl && (
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              data-testid={`link-github-${id}`}
-            >
-              <a href={githubUrl} target="_blank" rel="noopener noreferrer">
-                <Github className="w-4 h-4 mr-2" />
-                View Code
               </a>
             </Button>
           )}

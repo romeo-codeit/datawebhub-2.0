@@ -1,13 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProjectSchema, insertChatMessageSchema } from "@shared/schema";
+import { insertProjectSchema, insertChatMessageSchema, insertPromptSchema } from "@shared/schema";
 import { z } from "zod";
 import passport from "passport";
 import type { Request, Response, NextFunction } from "express";
 import multer from "multer";
+import Groq from "groq-sdk";
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
 function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated()) {
@@ -41,14 +42,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/projects/featured", async (_req, res) => {
-    try {
-      const projects = await storage.getFeaturedProjects();
-      res.json(projects);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch featured projects" });
-    }
-  });
+  // Removed as 'isFeatured' attribute is no longer in schema
+  // app.get("/api/projects/featured", async (_req, res) => {
+  //   try {
+  //     const projects = await storage.getFeaturedProjects();
+  //     res.json(projects);
+  //   } catch (error) {
+  //     res.status(500).json({ message: "Failed to fetch featured projects" });
+  //   }
+  // });
 
   app.get("/api/projects/category/:category", async (req, res) => {
     try {
@@ -75,14 +77,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/projects", ensureAuthenticated, upload.single("image"), async (req, res) => {
     try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Image file is required." });
+      }
+
+      const fileId = await storage.uploadFile(req.file);
+      const imageUrl = storage.getFileUrl(fileId);
+
       const validatedData = insertProjectSchema.parse({
         ...req.body,
-        technologies: req.body.technologies.split(","),
-        imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
+        technologies: req.body.technologies ? req.body.technologies.split(",") : [], // Ensure technologies is an array
+        imageUrl: imageUrl, // Use the URL from Appwrite Storage
       });
       const project = await storage.createProject(validatedData);
       res.status(201).json(project);
     } catch (error) {
+      console.error("Error creating project:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid project data", errors: error.errors });
       }
@@ -132,46 +142,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/chat", async (req, res) => {
     try {
-      const { message } = req.body;
+      const { message, prompts } = req.body;
       if (!message || typeof message !== 'string') {
         return res.status(400).json({ message: "Message is required" });
       }
 
-      // Simple AI response logic - in production, integrate with OpenAI, Claude, etc.
-      let response = "I'm Alex's AI assistant. Let me help you with information about Alex's work and skills.";
-      let animationData = { animation: "idle", emotion: "neutral" };
+      const groq = new Groq({
+        apiKey: process.env.GROQ_API_KEY,
+      });
 
-      const lowerMessage = message.toLowerCase();
-      
-      if (lowerMessage.includes("skill") || lowerMessage.includes("technology") || lowerMessage.includes("tech")) {
-        response = "Alex specializes in React, Next.js, Node.js, TypeScript, and modern web development. He also has strong UI/UX design skills and experience with cloud technologies including AWS and Docker. He's passionate about creating scalable, performant applications with great user experiences.";
-        animationData = { animation: "talk", emotion: "enthusiastic" };
-      } else if (lowerMessage.includes("project") || lowerMessage.includes("work") || lowerMessage.includes("portfolio")) {
-        response = "Alex has worked on various exciting projects including e-commerce platforms, mobile applications, and comprehensive design systems. His recent work includes a full-stack e-commerce solution with real-time features, a cross-platform task management app, and a scalable design system used across multiple products.";
-        animationData = { animation: "wave", emotion: "proud" };
-      } else if (lowerMessage.includes("contact") || lowerMessage.includes("hire") || lowerMessage.includes("email")) {
-        response = "You can reach Alex at hello@alexjohnson.dev or through his LinkedIn profile. He's always interested in discussing new opportunities and exciting projects. Feel free to download his resume or schedule a call to discuss your project needs!";
-        animationData = { animation: "nod", emotion: "helpful" };
-      } else if (lowerMessage.includes("experience") || lowerMessage.includes("background")) {
-        response = "Alex is a Senior Full-Stack Developer with 5+ years of experience. He currently works at TechCorp Solutions leading development of enterprise applications. Previously, he worked at a creative agency developing solutions for Fortune 500 clients. He has a strong background in both technical development and user experience design.";
-        animationData = { animation: "talk", emotion: "professional" };
-      } else if (lowerMessage.includes("hello") || lowerMessage.includes("hi") || lowerMessage.includes("hey")) {
-        response = "Hello! I'm Alex's AI assistant. I'm here to help you learn more about Alex's skills, projects, and experience. What would you like to know?";
-        animationData = { animation: "wave", emotion: "friendly" };
-      }
+      const systemPrompts = prompts.map((p: any) => ({
+        role: "system",
+        content: p.promptText,
+      }));
+
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [
+          ...systemPrompts,
+          { role: "user", content: message },
+        ],
+        model: "llama3-8b-8192",
+      });
+
+      const response = chatCompletion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
+
+      // TODO: You can add logic here to determine the animation and emotion based on the response
+      const animationData = { animation: "talk", emotion: "neutral" };
 
       const chatMessage = await storage.createChatMessage({
         message,
         response,
-        metadata: animationData
+        metadata: animationData,
       });
 
       res.json(chatMessage);
     } catch (error) {
+      console.error("Error processing chat message:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid message data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to process chat message" });
+    }
+  });
+
+  // Prompt routes
+  app.post("/api/prompts", ensureAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertPromptSchema.parse(req.body);
+      const prompt = await storage.createPrompt(validatedData);
+      res.status(201).json(prompt);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid prompt data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create prompt" });
+    }
+  });
+
+  app.get("/api/prompts", ensureAuthenticated, async (_req, res) => {
+    try {
+      const prompts = await storage.getPrompts();
+      res.json(prompts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch prompts" });
+    }
+  });
+
+  app.put("/api/prompts/:id", ensureAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertPromptSchema.partial().parse(req.body);
+      const prompt = await storage.updatePrompt(id, validatedData);
+      res.json(prompt);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid prompt data", errors: error.errors });
+      }
+      if (error instanceof Error && error.message.includes("not found")) {
+        return res.status(404).json({ message: "Prompt not found" });
+      }
+      res.status(500).json({ message: "Failed to update prompt" });
+    }
+  });
+
+  app.delete("/api/prompts/:id", ensureAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deletePrompt(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Prompt not found" });
+      }
+      res.json({ message: "Prompt deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete prompt" });
     }
   });
 

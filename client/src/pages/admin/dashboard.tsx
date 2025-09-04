@@ -4,32 +4,50 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Prompt } from "@shared/schema";
+import { Loader2, Edit, Trash2 } from "lucide-react";
 
 export default function DashboardPage() {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [longDescription, setLongDescription] = useState("");
+  const [description, setDescription] = useState(""); // Now holds merged description
   const [category, setCategory] = useState("web");
   const [technologies, setTechnologies] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null); // Reintroduced imageFile state
   const [demoUrl, setDemoUrl] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [isLoadingProject, setIsLoadingProject] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [promptText, setPromptText] = useState("");
+  const [promptType, setPromptType] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [isLoadingPrompt, setIsLoadingPrompt] = useState(false);
+  const [editingPromptId, setEditingPromptId] = useState<string | null>(null);
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch existing prompts
+  const { data: prompts, isLoading: isLoadingPrompts, error: promptsError } = useQuery<Prompt[]>({
+    queryKey: ["prompts"],
+    queryFn: async () => {
+      const response = await fetch("/api/prompts");
+      if (!response.ok) {
+        throw new Error("Failed to fetch prompts");
+      }
+      return response.json();
+    },
+  });
+
+  const handleSubmitProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsLoadingProject(true);
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("longDescription", longDescription);
     formData.append("category", category);
     formData.append("technologies", technologies);
     formData.append("demoUrl", demoUrl);
-    formData.append("githubUrl", githubUrl);
     if (imageFile) {
       formData.append("image", imageFile);
     }
@@ -37,7 +55,7 @@ export default function DashboardPage() {
     try {
       const response = await fetch("/api/projects", {
         method: "POST",
-        body: formData,
+        body: formData, // Send FormData directly
       });
 
       if (response.ok) {
@@ -48,13 +66,10 @@ export default function DashboardPage() {
         // Clear form
         setTitle("");
         setDescription("");
-        setLongDescription("");
         setCategory("web");
         setTechnologies("");
-        setImageUrl("");
+        setImageFile(null); // Clear file input
         setDemoUrl("");
-        setGithubUrl("");
-        setImageFile(null);
       } else {
         const errorData = await response.json();
         toast({
@@ -70,7 +85,99 @@ export default function DashboardPage() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoadingProject(false);
+    }
+  };
+
+  const handleSubmitPrompt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoadingPrompt(true);
+
+    const promptData = {
+      promptText,
+      promptType,
+      isActive,
+    };
+
+    const method = editingPromptId ? "PUT" : "POST";
+    const url = editingPromptId ? `/api/prompts/${editingPromptId}` : "/api/prompts";
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(promptData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: `Prompt ${editingPromptId ? "Updated" : "Added"}`,
+          description: `AI prompt has been ${editingPromptId ? "updated" : "added"} successfully.`,
+        });
+        // Invalidate prompts query to refetch list
+        queryClient.invalidateQueries({ queryKey: ["prompts"] });
+        // Clear form
+        setPromptText("");
+        setPromptType("");
+        setIsActive(true);
+        setEditingPromptId(null); // Exit editing mode
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: `Prompt ${editingPromptId ? "Update" : "Add"} Failed`,
+          description: errorData.message || "An error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "An error occurred",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingPrompt(false);
+    }
+  };
+
+  const handleEditPrompt = (prompt: Prompt) => {
+    setEditingPromptId(prompt.$id);
+    setPromptText(prompt.promptText);
+    setPromptType(prompt.promptType);
+    setIsActive(prompt.isActive);
+  };
+
+  const handleDeletePrompt = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this prompt?")) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/prompts/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Prompt Deleted",
+          description: "AI prompt has been deleted successfully.",
+        });
+        queryClient.invalidateQueries({ queryKey: ["prompts"] });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Delete Failed",
+          description: errorData.message || "An error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "An error occurred",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -80,11 +187,11 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
         </div>
-        <div className="bg-card p-4 md:p-8 rounded-2xl shadow-lg border">
+        <div className="bg-card p-4 md:p-8 rounded-2xl shadow-lg border mb-8">
           <h2 className="text-2xl font-bold text-card-foreground mb-6">
             Upload New Project
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmitProject} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
@@ -100,35 +207,107 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Short Description</Label>
-              <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="longDescription">Long Description</Label>
-              <Textarea id="longDescription" value={longDescription} onChange={(e) => setLongDescription(e.target.value)} rows={5} />
+              <Label htmlFor="description">Description</Label>
+              <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="technologies">Technologies (comma-separated)</Label>
               <Input id="technologies" value={technologies} onChange={(e) => setTechnologies(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="image">Image</Label>
-              <Input id="image" type="file" onChange={(e) => setImageFile(e.target.files ? e.target.files[0] : null)} />
+              <Label htmlFor="imageFile">Image File</Label>
+              <Input id="imageFile" type="file" onChange={(e) => setImageFile(e.target.files ? e.target.files[0] : null)} />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="demoUrl">Demo URL</Label>
-                <Input id="demoUrl" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="githubUrl">GitHub URL</Label>
-                <Input id="githubUrl" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="demoUrl">Demo URL</Label>
+              <Input id="demoUrl" type="url" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} />
             </div>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Uploading..." : "Upload Project"}
+            <Button type="submit" disabled={isLoadingProject}>
+              {isLoadingProject ? "Uploading..." : "Upload Project"}
             </Button>
           </form>
+        </div>
+
+        {/* Prompt Management Section */}
+        <div className="bg-card p-4 md:p-8 rounded-2xl shadow-lg border mb-8">
+          <h2 className="text-2xl font-bold text-card-foreground mb-6">
+            {editingPromptId ? "Edit AI Prompt" : "Add New AI Prompt"}
+          </h2>
+          <form onSubmit={handleSubmitPrompt} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="promptText">Prompt Content</Label>
+              <Textarea id="promptText" value={promptText} onChange={(e) => setPromptText(e.target.value)} rows={5} required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="promptType">Prompt Type</Label>
+              <Input id="promptType" value={promptType} onChange={(e) => setPromptType(e.target.value)} required />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                className="h-4 w-4 text-primary rounded"
+              />
+              <Label htmlFor="isActive">Is Active</Label>
+            </div>
+            <div className="flex gap-4">
+              <Button type="submit" disabled={isLoadingPrompt}>
+                {isLoadingPrompt ? (editingPromptId ? "Updating..." : "Adding...") : (editingPromptId ? "Update Prompt" : "Add Prompt")}
+              </Button>
+              {editingPromptId && (
+                <Button variant="outline" onClick={() => {
+                  setEditingPromptId(null);
+                  setPromptText("");
+                  setPromptType("");
+                  setIsActive(true);
+                }}>
+                  Cancel Edit
+                </Button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        {/* Existing Prompts List */}
+        <div className="bg-card p-4 md:p-8 rounded-2xl shadow-lg border">
+          <h2 className="text-2xl font-bold text-card-foreground mb-6">
+            Existing AI Prompts
+          </h2>
+          {isLoadingPrompts ? (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : promptsError ? (
+            <div className="text-center py-10">
+              <p className="text-destructive">Failed to load prompts: {promptsError.message}</p>
+            </div>
+          ) : prompts && prompts.length > 0 ? (
+            <div className="space-y-4">
+              {prompts.map((prompt) => (
+                <div key={prompt.$id} className="p-4 border rounded-lg bg-muted/50 flex justify-between items-center">
+                  <div>
+                    <p className="font-semibold text-card-foreground">Type: {prompt.promptType}</p>
+                    <p className="text-sm text-muted-foreground">{prompt.promptText.substring(0, 100)}...</p>
+                    <p className="text-xs text-muted-foreground">Active: {prompt.isActive ? 'Yes' : 'No'}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="icon" onClick={() => handleEditPrompt(prompt)}>
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button variant="destructive" size="icon" onClick={() => handleDeletePrompt(prompt.$id)}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 text-muted-foreground">
+              No prompts added yet.
+            </div>
+          )}
         </div>
       </div>
     </section>

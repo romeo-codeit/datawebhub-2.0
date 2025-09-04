@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Project, type InsertProject, type ChatMessage, type InsertChatMessage } from "@shared/schema";
+import { type User, type InsertUser, type Project, type InsertProject, type ChatMessage, type InsertChatMessage, type Prompt, type InsertPrompt } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -19,17 +19,29 @@ export interface IStorage {
   // Chat methods
   getChatMessages(): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+
+  // Prompt methods
+  createPrompt(prompt: InsertPrompt): Promise<Prompt>;
+  getPrompts(): Promise<Prompt[]>;
+  updatePrompt(id: string, prompt: Partial<InsertPrompt>): Promise<Prompt>;
+  deletePrompt(id: string): Promise<boolean>;
+
+  // File methods
+  uploadFile(file: File): Promise<string>;
+  getFileUrl(fileId: string): string;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private projects: Map<string, Project>;
   private chatMessages: Map<string, ChatMessage>;
+  private prompts: Map<string, Prompt>; // Added for MemStorage
 
   constructor() {
     this.users = new Map();
     this.projects = new Map();
     this.chatMessages = new Map();
+    this.prompts = new Map(); // Initialize prompts map
     // No seed data in production - everything should be added via API
   }
 
@@ -123,6 +135,56 @@ export class MemStorage implements IStorage {
     this.chatMessages.set(id, message);
     return message;
   }
+
+  // Prompt methods for MemStorage
+  async createPrompt(insertPrompt: InsertPrompt): Promise<Prompt> {
+    const id = randomUUID();
+    const prompt: Prompt = {
+      $id: id,
+      promptText: insertPrompt.promptText,
+      promptType: insertPrompt.promptType,
+      isActive: insertPrompt.isActive,
+      $createdAt: new Date().toISOString(),
+      $updatedAt: new Date().toISOString(),
+    };
+    this.prompts.set(id, prompt);
+    return prompt;
+  }
+
+  async getPrompts(): Promise<Prompt[]> {
+    return Array.from(this.prompts.values()).sort((a, b) => 
+      new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime()
+    );
+  }
+
+  async updatePrompt(id: string, updateData: Partial<InsertPrompt>): Promise<Prompt> {
+    const existing = this.prompts.get(id);
+    if (!existing) {
+      throw new Error(`Prompt with id ${id} not found`);
+    }
+    const updated: Prompt = { ...existing, ...updateData, $updatedAt: new Date().toISOString() };
+    this.prompts.set(id, updated);
+    return updated;
+  }
+
+  async deletePrompt(id: string): Promise<boolean> {
+    return this.prompts.delete(id);
+  }
+
+  // File methods
+  async uploadFile(file: File): Promise<string> {
+    // In-memory storage doesn't actually store files, just return a dummy URL
+    console.warn("uploadFile not implemented for MemStorage. Returning dummy URL.");
+    return `http://localhost:5000/uploads/${file.name}`;
+  }
+
+  getFileUrl(fileId: string): string {
+    // In-memory storage doesn't actually store files, just return a dummy URL
+    console.warn("getFileUrl not implemented for MemStorage. Returning dummy URL.");
+    return `http://localhost:5000/uploads/${fileId}`;
+  }
 }
 
-export const storage = new MemStorage();
+import { AppwriteStorage } from './storage-appwrite';
+
+export const storage = new AppwriteStorage();

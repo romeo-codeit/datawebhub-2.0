@@ -1,7 +1,7 @@
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
-import { Loader2, ExternalLink, Github } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 async function fetchProject(id: string): Promise<Project> {
@@ -70,7 +70,8 @@ export default function ProjectDetail() {
         />
 
         <div className="prose prose-invert max-w-none">
-          <p>{project.longDescription}</p>
+          {/* longDescription was merged into description */}
+          <p>{project.description}</p>
         </div>
 
         <div className="mt-12 flex flex-wrap gap-4">
@@ -79,14 +80,6 @@ export default function ProjectDetail() {
               <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Live Demo
-              </a>
-            </Button>
-          )}
-          {project.githubUrl && (
-            <Button variant="secondary" asChild>
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                <Github className="mr-2 h-4 w-4" />
-                View Code
               </a>
             </Button>
           )}

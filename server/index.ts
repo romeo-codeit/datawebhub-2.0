@@ -1,3 +1,10 @@
+import { config } from 'dotenv';
+import { resolve } from 'path';
+// Load environment variables from .env file in the project root
+// When npm run dev is executed from the root, process.cwd() is the root.
+// So, './.env' correctly points to the .env file in the root.
+config({ path: resolve(process.cwd(), './.env') });
+
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import passport from "passport";
@@ -6,6 +13,7 @@ import os from "node:os";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
+import { users } from "./lib/appwrite"; // Import Appwrite users service
 
 const app = express();
 app.use(express.json());
@@ -27,16 +35,19 @@ app.use(passport.session());
 passport.use(new LocalStrategy(
   async (username, password, done) => {
     try {
-      const user = await storage.getUserByUsername(username);
+      // Use Appwrite to create a session, which also verifies the password
+      const session = await users.createSession(username, password);
+      const user = await storage.getUser(session.userId); // Get user details from storage
+
       if (!user) {
-        return done(null, false, { message: "Incorrect username." });
-      }
-      const isValid = await storage.verifyPassword(password, user.password);
-      if (!isValid) {
-        return done(null, false, { message: "Incorrect password." });
+        // This case should ideally not happen if session creation was successful
+        return done(null, false, { message: "User not found after successful session creation." });
       }
       return done(null, user);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.code === 401) { // Appwrite returns 401 for invalid credentials
+        return done(null, false, { message: "Incorrect username or password." });
+      }
       return done(err);
     }
   }
@@ -48,7 +59,7 @@ passport.serializeUser((user: any, done) => {
 
 passport.deserializeUser(async (id: string, done) => {
   try {
-    const user = await storage.getUserById(id);
+    const user = await storage.getUser(id); // Corrected to getUser
     done(null, user);
   } catch (err) {
     done(err);
