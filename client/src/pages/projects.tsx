@@ -7,24 +7,11 @@ import { Loader2, Plus } from "lucide-react";
 
 type FilterType = 'all' | 'web' | 'mobile' | 'design';
 
-// NOTE: This is fallback data for demonstration purposes.
-// In a real application, this data would be fetched from the API.
-const allProjects = [
-  { id: 1, title: "E-commerce Platform", description: "A full-featured e-commerce site with a modern UI.", imageUrl: "/placeholder.svg", technologies: ["React", "Node.js", "TypeScript"], category: "web", demoUrl: "#", githubUrl: "#" },
-  { id: 2, title: "Task Management App", description: "A mobile-first task management application designed for productivity.", imageUrl: "/placeholder.svg", technologies: ["React Native", "Firebase"], category: "mobile", demoUrl: "#", githubUrl: "#" },
-  { id: 3, title: "Portfolio Website", description: "A personal portfolio to showcase my work and skills.", imageUrl: "/placeholder.svg", technologies: ["Next.js", "Tailwind CSS"], category: "web", demoUrl: "#", githubUrl: "#" },
-  { id: 4, title: "Design System", description: "A comprehensive design system for a large-scale application.", imageUrl: "/placeholder.svg", technologies: ["Figma", "Storybook"], category: "design", demoUrl: "#", githubUrl: "#" },
-  { id: 5, title: "Social Media App", description: "A concept for a new social media platform with a unique twist.", imageUrl: "/placeholder.svg", technologies: ["SwiftUI", "GraphQL"], category: "mobile", demoUrl: "#", githubUrl: "#" },
-  { id: 6, title: "Data Visualization Tool", description: "A tool for visualizing complex data sets in an intuitive way.", imageUrl: "/placeholder.svg", technologies: ["D3.js", "React"], category: "web", demoUrl: "#", githubUrl: "#" },
-];
-
 export default function Projects() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const { data: projectsFromApi, isLoading, error } = useProjects(activeFilter);
+  const { data: projects, isLoading, error } = useProjects(activeFilter);
   
   useScrollReveal();
-
-  const projects = projectsFromApi && projectsFromApi.length > 0 ? projectsFromApi : allProjects;
 
   const filters: { key: FilterType; label: string }[] = [
     { key: 'all', label: 'All Projects' },

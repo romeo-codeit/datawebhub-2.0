@@ -1,43 +1,35 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import SkillBar from "@/components/skill-bar";
 import { useScrollReveal } from "@/lib/animations";
+import { Briefcase, Code, Star } from "lucide-react";
 
 export default function About() {
   useScrollReveal();
 
   // NOTE: This is placeholder data for demonstration purposes.
   // In a real application, this data would likely be fetched from an API.
-  const skills: Array<{name: string, level: number}> = [
-    { name: "React & Next.js", level: 95 },
-    { name: "Node.js & Express", level: 90 },
-    { name: "TypeScript", level: 92 },
-    { name: "GraphQL & Apollo", level: 85 },
-    { name: "Docker & Kubernetes", level: 75 },
-    { name: "Figma & UI Design", level: 88 },
+  const skills = [
+    "JavaScript (ES6+)", "TypeScript", "React", "Next.js", "Node.js", "GraphQL",
+    "Tailwind CSS", "Figma", "Docker", "Kubernetes", "PostgreSQL", "Prisma"
   ];
 
-  // Experiences should be fetched from API in production
-  const experiences: Array<{title: string, company: string, period: string, description: string, color: string}> = [
+  const experiences = [
     {
       title: "Senior Frontend Developer",
       company: "Innovate Inc.",
       period: "2021 - Present",
-      description: "Leading the development of a new design system and component library from the ground up, resulting in a 40% increase in development velocity. Collaborating with product and design teams to create elegant and intuitive user interfaces.",
-      color: "primary"
+      description: "Leading the development of a new design system and component library from the ground up, resulting in a 40% increase in development velocity. Collaborating with product and design teams to create elegant and intuitive user interfaces."
     },
     {
       title: "Full-Stack Developer",
       company: "Tech Solutions",
       period: "2018 - 2021",
-      description: "Built and maintained scalable web applications for a diverse range of clients using React, Node.js, and PostgreSQL. Contributed to all phases of the development lifecycle, from concept to deployment.",
-      color: "accent"
+      description: "Built and maintained scalable web applications for a diverse range of clients using React, Node.js, and PostgreSQL. Contributed to all phases of the development lifecycle, from concept to deployment."
     },
     {
       title: "Junior Web Developer",
       company: "Digital Creations",
       period: "2016 - 2018",
-      description: "Assisted in the development and maintenance of client websites, primarily using HTML, CSS, and JavaScript. Gained foundational experience in version control with Git and agile methodologies.",
-      color: "primary"
+      description: "Assisted in the development and maintenance of client websites, primarily using HTML, CSS, and JavaScript. Gained foundational experience in version control with Git and agile methodologies."
     }
   ];
 
@@ -54,73 +46,58 @@ export default function About() {
           </p>
         </div>
         
-        <div className="grid lg:grid-cols-3 gap-12 items-start">
-          {/* Profile */}
-          <div className="lg:col-span-1 scroll-reveal">
-            <div className="bg-card rounded-2xl p-8 text-center shadow-lg border">
-              <Avatar className="w-40 h-40 mx-auto mb-6 border-4 border-primary shadow-xl">
-                {/* Avatar image should be provided via environment variable or API */}
-                <AvatarImage 
-                  src={(import.meta.env.VITE_USER_AVATAR) || ""} 
-                  alt="Profile photo" 
-                />
-                <AvatarFallback>AJ</AvatarFallback>
-              </Avatar>
-              <h3 className="font-heading text-2xl font-bold text-card-foreground mb-1" data-testid="text-name">
-                {/* Name should be provided via environment variable */}
+        <div className="grid lg:grid-cols-3 gap-16 items-start">
+          {/* Left Column: Profile */}
+          <div className="lg:col-span-1 space-y-8 scroll-reveal sticky top-24">
+            <Avatar className="w-48 h-48 mx-auto border-4 border-primary shadow-xl">
+              <AvatarImage src={(import.meta.env.VITE_USER_AVATAR) || ""} alt="Profile photo" />
+              <AvatarFallback>AJ</AvatarFallback>
+            </Avatar>
+            <div className="text-center">
+              <h3 className="font-heading text-3xl font-bold text-foreground" data-testid="text-name">
                 {(import.meta.env.VITE_USER_NAME) || "Your Name"}
               </h3>
-              <p className="text-primary font-medium mb-4" data-testid="text-title">
-                {/* Title should be provided via environment variable */}
+              <p className="text-primary text-lg font-medium" data-testid="text-title">
                 {(import.meta.env.VITE_USER_TITLE) || "Your Professional Title"}
               </p>
-              <p className="text-muted-foreground text-base leading-relaxed" data-testid="text-bio">
-                {/* Bio should be provided via environment variable */}
-                {(import.meta.env.VITE_USER_BIO) || "Add your professional bio via the VITE_USER_BIO environment variable."}
-              </p>
             </div>
+            <p className="text-muted-foreground text-center text-lg leading-relaxed" data-testid="text-bio">
+              {(import.meta.env.VITE_USER_BIO) || "Add your professional bio via the VITE_USER_BIO environment variable."}
+            </p>
           </div>
           
-          {/* Skills & Experience */}
-          <div className="lg:col-span-2 space-y-12 scroll-reveal">
-            <div className="bg-card rounded-2xl p-8 shadow-lg border">
-              <h3 className="font-heading text-3xl font-bold text-card-foreground mb-6">
-                Technical Skills
+          {/* Right Column: Experience & Skills */}
+          <div className="lg:col-span-2 space-y-16">
+            {/* Experience Timeline */}
+            <div className="scroll-reveal">
+              <h3 className="font-heading text-3xl font-bold text-foreground mb-8 flex items-center">
+                <Briefcase className="w-8 h-8 mr-4 text-primary" />
+                Work Experience
               </h3>
-              <div className="space-y-5">
-                {skills.map((skill, index) => (
-                  <SkillBar 
-                    key={skill.name} 
-                    name={skill.name} 
-                    level={skill.level}
-                    delay={index * 150}
-                  />
+              <div className="relative border-l-2 border-border pl-8 space-y-12">
+                {experiences.map((exp, index) => (
+                  <div key={index} className="relative">
+                    <div className="absolute -left-10 w-4 h-4 bg-primary rounded-full border-4 border-background"></div>
+                    <p className="text-sm text-primary font-semibold">{exp.period}</p>
+                    <h4 className="font-semibold text-foreground text-xl mt-1">{exp.title}</h4>
+                    <p className="text-muted-foreground font-medium">{exp.company}</p>
+                    <p className="text-muted-foreground mt-2">{exp.description}</p>
+                  </div>
                 ))}
               </div>
             </div>
-            
-            {/* Experience Timeline */}
-            <div className="bg-card rounded-2xl p-8 shadow-lg border">
-              <h3 className="font-heading text-3xl font-bold text-card-foreground mb-8">
-                Work Experience
+
+            {/* Skills Grid */}
+            <div className="scroll-reveal">
+              <h3 className="font-heading text-3xl font-bold text-foreground mb-8 flex items-center">
+                <Code className="w-8 h-8 mr-4 text-primary" />
+                Technical Skills
               </h3>
-              <div className="space-y-8">
-                {experiences.map((exp, index) => (
-                  <div 
-                    key={exp.title} 
-                    className={`border-l-4 pl-6 ${
-                      exp.color === 'primary' ? 'border-primary' : 'border-accent'
-                    }`}
-                  >
-                    <h4 className="font-semibold text-card-foreground text-xl" data-testid={`text-job-title-${index}`}>
-                      {exp.title}
-                    </h4>
-                    <p className={`font-medium mb-2 text-primary`} data-testid={`text-company-${index}`}>
-                      {exp.company} • {exp.period}
-                    </p>
-                    <p className="text-muted-foreground mt-2" data-testid={`text-description-${index}`}>
-                      {exp.description}
-                    </p>
+              <div className="flex flex-wrap gap-3">
+                {skills.map((skill) => (
+                  <div key={skill} className="flex items-center bg-card border rounded-lg px-4 py-2">
+                    <Star className="w-4 h-4 mr-2 text-primary" />
+                    <span className="font-medium text-card-foreground">{skill}</span>
                   </div>
                 ))}
               </div>

@@ -7,69 +7,40 @@
   --font-heading: 'Poppins', sans-serif;
   --font-mono: 'Menlo', monospace;
 
-  --background: hsl(48, 50%, 95%);
-  --foreground: hsl(98, 21%, 30%);
+  --background: hsl(210, 10%, 15%);
+  --foreground: hsl(0, 0%, 95%);
 
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(98, 21%, 30%);
+  --card: hsl(210, 10%, 20%);
+  --card-foreground: hsl(0, 0%, 95%);
 
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(98, 21%, 30%);
+  --popover: hsl(210, 10%, 20%);
+  --popover-foreground: hsl(0, 0%, 95%);
 
-  --primary: hsl(206, 41%, 81%); /* Pastel Blue */
-  --primary-foreground: hsl(98, 21%, 30%);
+  --primary: hsl(175, 70%, 45%); /* Vibrant Teal */
+  --primary-foreground: hsl(210, 10%, 15%);
 
-  --secondary: hsl(98, 21%, 30%); /* Forest Green */
-  --secondary-foreground: hsl(48, 44%, 89%);
+  --secondary: hsl(0, 0%, 95%); /* Off-white */
+  --secondary-foreground: hsl(210, 10%, 15%);
 
-  --muted: hsl(48, 44%, 89%);
-  --muted-foreground: hsl(98, 21%, 40%);
+  --muted: hsl(210, 10%, 25%);
+  --muted-foreground: hsl(0, 0%, 60%);
 
-  --accent: hsl(15, 43%, 74%); /* Soft Terracotta */
-  --accent-foreground: hsl(98, 21%, 30%);
+  --accent: hsl(175, 70%, 55%);
+  --accent-foreground: hsl(210, 10%, 15%);
 
   --destructive: hsl(0, 70%, 50%);
-  --destructive-foreground: hsl(0, 0%, 100%);
+  --destructive-foreground: hsl(0, 0%, 95%);
 
-  --border: hsl(48, 44%, 85%);
-  --input: hsl(48, 44%, 93%);
-  --ring: hsl(98, 21%, 30%);
+  --border: hsl(210, 10%, 30%);
+  --input: hsl(210, 10%, 25%);
+  --ring: hsl(175, 70%, 45%);
 
   --radius: 0.75rem;
-
-  /* Additional Accent Colors */
-  --accent-cream: hsl(48, 44%, 89%);
-  --accent-terracotta: hsl(15, 43%, 74%);
 }
 
 .dark {
-  --background: hsl(98, 15%, 10%);
-  --foreground: hsl(48, 44%, 89%);
-
-  --card: hsl(98, 15%, 15%);
-  --card-foreground: hsl(48, 44%, 89%);
-
-  --popover: hsl(98, 15%, 10%);
-  --popover-foreground: hsl(48, 44%, 89%);
-
-  --primary: hsl(206, 41%, 81%); /* Pastel Blue */
-  --primary-foreground: hsl(98, 15%, 10%);
-
-  --secondary: hsl(48, 44%, 89%); /* Light Cream */
-  --secondary-foreground: hsl(98, 15%, 10%);
-
-  --muted: hsl(98, 15%, 20%);
-  --muted-foreground: hsl(48, 44%, 70%);
-
-  --accent: hsl(15, 43%, 74%); /* Soft Terracotta */
-  --accent-foreground: hsl(98, 15%, 10%);
-
-  --destructive: hsl(0, 60%, 50%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-
-  --border: hsl(98, 15%, 25%);
-  --input: hsl(98, 15%, 22%);
-  --ring: hsl(206, 41%, 81%);
+  /* The :root selector already defines the dark theme.
+     This class is kept for compatibility but can be removed if not needed. */
 }
 
 @layer base {
