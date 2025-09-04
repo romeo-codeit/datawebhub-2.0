@@ -14,7 +14,7 @@ export default function Home() {
     <>
       <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-background z-0">
-          <div className="absolute inset-0 bg-grid-white/[0.05]"></div>
+          <div className="absolute inset-0 bg-grid-white/[0.05] animate-grid-pan"></div>
         </div>
         <div className="container mx-auto px-6 lg:px-8 max-w-7xl relative z-10">
           <div className="text-center scroll-reveal">
@@ -43,12 +43,6 @@ export default function Home() {
                 <Button size="lg" data-testid="button-view-work">
                   <Rocket className="mr-2" />
                   View My Work
-                </Button>
-              </Link>
-              <Link href="/chat">
-                <Button size="lg" variant="secondary" data-testid="button-lets-chat">
-                  <MessageCircle className="mr-2" />
-                  Let's Chat
                 </Button>
               </Link>
             </div>
