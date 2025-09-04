@@ -5,6 +5,7 @@ import { useScrollReveal } from "@/lib/animations";
 import { TypeAnimation } from "react-type-animation";
 import ProjectCard from "@/components/project-card";
 import { useFeaturedProjects } from "@/hooks/use-projects";
+import ParticleBackground from "@/components/particle-background";
 
 export default function Home() {
   useScrollReveal();
@@ -13,9 +14,7 @@ export default function Home() {
   return (
     <>
       <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-background z-0">
-          <div className="absolute inset-0 bg-grid-white/[0.05] animate-grid-pan"></div>
-        </div>
+        <ParticleBackground />
         <div className="container mx-auto px-6 lg:px-8 max-w-7xl relative z-10">
           <div className="text-center scroll-reveal">
             <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tighter mb-8">
