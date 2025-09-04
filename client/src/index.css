@@ -1,98 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: hsl(312, 100%, 8%);
-  --foreground: hsl(167, 100%, 69%);
-  --card: hsl(312, 50%, 10%);
-  --card-foreground: hsl(167, 100%, 69%);
-  --primary: hsl(167, 100%, 69%);
-  --primary-foreground: hsl(312, 100%, 8%);
-  --secondary: hsl(250, 100%, 37%);
-  --secondary-foreground: hsl(167, 100%, 69%);
-  --muted: hsl(312, 50%, 15%);
-  --muted-foreground: hsl(167, 50%, 50%);
-  --accent: hsl(244, 55%, 58%);
-  --accent-foreground: hsl(167, 100%, 69%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(312, 30%, 20%);
-  --input: hsl(312, 30%, 15%);
-  --ring: hsl(167, 100%, 69%);
-  --radius: 12px;
-
-  /* Custom Portfolio Colors */
-  --dark-purple: hsl(312, 100%, 8%);
-  --dark-purple-50: hsl(312, 50%, 95%);
-  --dark-purple-100: hsl(312, 50%, 90%);
-  --dark-purple-200: hsl(312, 50%, 20%);
-  --dark-purple-300: hsl(312, 50%, 15%);
-  --dark-purple-400: hsl(312, 50%, 12%);
-  --dark-purple-500: hsl(312, 100%, 8%);
-  --dark-purple-600: hsl(312, 100%, 6%);
-  --dark-purple-700: hsl(312, 100%, 4%);
-  --dark-purple-800: hsl(312, 100%, 3%);
-  --dark-purple-900: hsl(312, 100%, 2%);
-
-  --cyan-primary: hsl(167, 100%, 69%);
-  --cyan-50: hsl(167, 100%, 95%);
-  --cyan-100: hsl(167, 100%, 90%);
-  --cyan-200: hsl(167, 100%, 85%);
-  --cyan-300: hsl(167, 100%, 80%);
-  --cyan-400: hsl(167, 100%, 75%);
-  --cyan-500: hsl(167, 100%, 69%);
-  --cyan-600: hsl(167, 100%, 60%);
-  --cyan-700: hsl(167, 100%, 50%);
-  --cyan-800: hsl(167, 100%, 40%);
-  --cyan-900: hsl(167, 100%, 30%);
-
-  --purple-accent: hsl(280, 100%, 37%);
-  --purple-accent-50: hsl(280, 100%, 95%);
-  --purple-accent-100: hsl(280, 100%, 90%);
-  --purple-accent-200: hsl(280, 100%, 80%);
-  --purple-accent-300: hsl(280, 100%, 70%);
-  --purple-accent-400: hsl(280, 100%, 60%);
-  --purple-accent-500: hsl(280, 100%, 37%);
-  --purple-accent-600: hsl(280, 100%, 30%);
-  --purple-accent-700: hsl(280, 100%, 25%);
-
-  --blue-accent: hsl(244, 55%, 58%);
-  --blue-accent-50: hsl(244, 55%, 95%);
-  --blue-accent-100: hsl(244, 55%, 90%);
-  --blue-accent-200: hsl(244, 55%, 80%);
-  --blue-accent-300: hsl(244, 55%, 70%);
-  --blue-accent-400: hsl(244, 55%, 65%);
-  --blue-accent-500: hsl(244, 55%, 58%);
-  --blue-accent-600: hsl(244, 55%, 50%);
-  --blue-accent-700: hsl(244, 55%, 40%);
-
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-sans: 'Poppins', sans-serif;
+  --font-heading: 'Poppins', sans-serif;
   --font-mono: 'Menlo', monospace;
+
+  --background: hsl(270, 20%, 98%); /* Light variant of secondary for background */
+  --foreground: hsl(270, 20%, 25%); /* Darker plum for text */
+
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(270, 20%, 25%);
+
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(270, 20%, 25%);
+
+  --primary: hsl(270, 20%, 37%); /* Deep Plum */
+  --primary-foreground: hsl(26, 25%, 95%); /* Lighter beige for text on primary */
+
+  --secondary: hsl(26, 25%, 80%); /* Soft Beige */
+  --secondary-foreground: hsl(270, 20%, 37%); /* Deep plum for text on secondary */
+
+  --muted: hsl(26, 25%, 90%);
+  --muted-foreground: hsl(270, 20%, 45%);
+
+  --accent: hsl(43, 40%, 63%); /* Muted Gold */
+  --accent-foreground: hsl(270, 20%, 25%);
+
+  --destructive: hsl(0, 70%, 50%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+
+  --border: hsl(26, 25%, 85%);
+  --input: hsl(26, 25%, 95%);
+  --ring: hsl(270, 20%, 37%);
+
+  --radius: 0.75rem;
+
+  /* Additional Accent Colors */
+  --accent-sage: hsl(112, 10%, 67%);
+  --accent-navy: hsl(218, 22%, 37%);
 }
 
 .dark {
-  --background: hsl(312, 100%, 8%);
-  --foreground: hsl(167, 100%, 69%);
-  --card: hsl(312, 50%, 10%);
-  --card-foreground: hsl(167, 100%, 69%);
-  --popover: hsl(312, 100%, 8%);
-  --popover-foreground: hsl(167, 100%, 69%);
-  --primary: hsl(167, 100%, 69%);
-  --primary-foreground: hsl(312, 100%, 8%);
-  --secondary: hsl(250, 100%, 37%);
-  --secondary-foreground: hsl(167, 100%, 69%);
-  --muted: hsl(312, 50%, 15%);
-  --muted-foreground: hsl(167, 50%, 50%);
-  --accent: hsl(244, 55%, 58%);
-  --accent-foreground: hsl(167, 100%, 69%);
-  --destructive: hsl(356, 90%, 54%);
+  --background: hsl(270, 20%, 10%);
+  --foreground: hsl(26, 25%, 80%);
+
+  --card: hsl(270, 20%, 15%);
+  --card-foreground: hsl(26, 25%, 80%);
+
+  --popover: hsl(270, 20%, 10%);
+  --popover-foreground: hsl(26, 25%, 80%);
+
+  --primary: hsl(26, 25%, 80%); /* Soft Beige for primary in dark mode */
+  --primary-foreground: hsl(270, 20%, 15%);
+
+  --secondary: hsl(270, 20%, 37%); /* Deep Plum for secondary in dark mode */
+  --secondary-foreground: hsl(26, 25%, 95%);
+
+  --muted: hsl(270, 20%, 20%);
+  --muted-foreground: hsl(26, 25%, 70%);
+
+  --accent: hsl(43, 40%, 63%); /* Muted Gold */
+  --accent-foreground: hsl(270, 20%, 15%);
+
+  --destructive: hsl(0, 60%, 50%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(312, 30%, 20%);
-  --input: hsl(312, 30%, 15%);
-  --ring: hsl(167, 100%, 69%);
+
+  --border: hsl(270, 20%, 25%);
+  --input: hsl(270, 20%, 22%);
+  --ring: hsl(43, 40%, 63%);
 }
 
 @layer base {
@@ -101,10 +78,8 @@
   }
 
   body {
-    @apply font-sans antialiased;
-    background: linear-gradient(135deg, var(--dark-purple) 0%, hsl(312, 80%, 12%) 50%, hsl(312, 60%, 15%) 100%);
+    @apply font-sans bg-background text-foreground antialiased;
     min-height: 100vh;
-    color: var(--cyan-primary);
   }
 
   .font-heading {
@@ -114,17 +89,14 @@
 
 @layer components {
   .gradient-text {
-    background: linear-gradient(135deg, var(--cyan-primary), var(--purple-accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--primary);
   }
 
   .glass-effect {
-    @apply backdrop-blur-md border;
-    background: var(--dark-purple-300);
-    border-color: var(--cyan-primary);
-    border-opacity: 0.2;
+    @apply border rounded-lg;
+    background-color: hsl(var(--card) / 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .floating-nav {
@@ -160,13 +132,8 @@
   }
 
   .skill-fill {
-    @apply h-full transition-all duration-1000 ease-out;
-    background: linear-gradient(90deg, var(--cyan-primary), var(--purple-accent));
+    @apply h-full transition-all duration-1000 ease-out bg-primary;
     transform-origin: left;
-  }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
   }
 
   .animate-pulse-slow {
@@ -175,21 +142,6 @@
 
   .animate-bounce-slow {
     animation: bounce 2s infinite;
-  }
-
-  .particle {
-    @apply absolute rounded-full opacity-30;
-    background: var(--cyan-primary);
-    animation: float 8s linear infinite;
-  }
-}
-
-@keyframes float {
-  0%, 100% { 
-    transform: translateY(0px); 
-  }
-  50% { 
-    transform: translateY(-20px); 
   }
 }
 
@@ -222,22 +174,4 @@
     opacity: 1;
     transform: scale(1);
   }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--dark-purple-200);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--cyan-primary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--cyan-600);
 }
