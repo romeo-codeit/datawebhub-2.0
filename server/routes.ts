@@ -3,8 +3,34 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProjectSchema, insertChatMessageSchema } from "@shared/schema";
 import { z } from "zod";
+import passport from "passport";
+import type { Request, Response, NextFunction } from "express";
+import multer from "multer";
+
+const upload = multer({ dest: "uploads/" });
+
+function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: "Unauthorized" });
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+    res.json({ message: "Logged in successfully", user: req.user });
+  });
+
+  app.post("/api/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Error logging out" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
   // Project routes
   app.get("/api/projects", async (_req, res) => {
     try {
@@ -47,9 +73,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects", async (req, res) => {
+  app.post("/api/projects", ensureAuthenticated, upload.single("image"), async (req, res) => {
     try {
-      const validatedData = insertProjectSchema.parse(req.body);
+      const validatedData = insertProjectSchema.parse({
+        ...req.body,
+        technologies: req.body.technologies.split(","),
+        imageUrl: req.file ? `/uploads/${req.file.filename}` : undefined,
+      });
       const project = await storage.createProject(validatedData);
       res.status(201).json(project);
     } catch (error) {
@@ -60,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/projects/:id", async (req, res) => {
+  app.put("/api/projects/:id", ensureAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const validatedData = insertProjectSchema.partial().parse(req.body);
@@ -77,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/projects/:id", async (req, res) => {
+  app.delete("/api/projects/:id", ensureAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const deleted = await storage.deleteProject(id);

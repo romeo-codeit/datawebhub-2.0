@@ -1,11 +1,59 @@
 import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
 import os from "node:os";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || "a-secret-key-for-sessions-that-is-long-and-secure",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: app.get("env") === "production" },
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport configuration
+passport.use(new LocalStrategy(
+  async (username, password, done) => {
+    try {
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return done(null, false, { message: "Incorrect username." });
+      }
+      const isValid = await storage.verifyPassword(password, user.password);
+      if (!isValid) {
+        return done(null, false, { message: "Incorrect password." });
+      }
+      return done(null, user);
+    } catch (err) {
+      return done(err);
+    }
+  }
+));
+
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await storage.getUserById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
 
 app.use((req, res, next) => {
   const start = Date.now();

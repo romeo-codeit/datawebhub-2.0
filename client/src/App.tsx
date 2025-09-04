@@ -9,6 +9,8 @@ import About from "@/pages/about";
 import Projects from "@/pages/projects";
 import ProjectDetail from "@/pages/project-detail";
 import Chat from "@/pages/chat";
+import LoginPage from "@/pages/admin/login";
+import DashboardPage from "@/pages/admin/dashboard";
 import FloatingNav from "@/components/floating-nav";
 
 function Router() {
@@ -21,6 +23,8 @@ function Router() {
         <Route path="/projects" component={Projects} />
         <Route path="/projects/:id" component={ProjectDetail} />
         <Route path="/chat" component={Chat} />
+        <Route path="/admin/login" component={LoginPage} />
+        <Route path="/admin/dashboard" component={DashboardPage} />
         <Route component={NotFound} />
       </Switch>
     </>
