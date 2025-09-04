@@ -20,15 +20,15 @@ export default function Home() {
           <div className="text-center scroll-reveal">
             <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight tracking-tighter mb-8">
               <span className="block text-foreground">
-                {(import.meta.env.VITE_USER_NAME) || "Your Name"}
+                Hello, I'm Romeo.
               </span>
               <TypeAnimation
                 sequence={[
-                  (import.meta.env.VITE_HERO_TITLE_1) || 'A Creative Developer',
+                  'A Creative Developer.',
                   2000,
-                  (import.meta.env.VITE_HERO_TITLE_2) || 'A Passionate Coder',
+                  'I build things for the web.',
                   2000,
-                  (import.meta.env.VITE_HERO_DESCRIPTION) || 'Building Digital Experiences',
+                  'Let\'s create something amazing.',
                   2000,
                 ]}
                 wrapper="span"

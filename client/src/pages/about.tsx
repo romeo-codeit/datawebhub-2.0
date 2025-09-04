@@ -9,7 +9,8 @@ export default function About() {
   // In a real application, this data would likely be fetched from an API.
   const skills = [
     "JavaScript (ES6+)", "TypeScript", "React", "Next.js", "Node.js", "GraphQL",
-    "Tailwind CSS", "Figma", "Docker", "Kubernetes", "PostgreSQL", "Prisma"
+    "Tailwind CSS", "Figma", "Docker", "Kubernetes", "PostgreSQL", "Prisma",
+    "AWS", "Google Cloud", "CI/CD", "Jest & Vitest"
   ];
 
   const experiences = [
@@ -17,19 +18,19 @@ export default function About() {
       title: "Senior Frontend Developer",
       company: "Innovate Inc.",
       period: "2021 - Present",
-      description: "Leading the development of a new design system and component library from the ground up, resulting in a 40% increase in development velocity. Collaborating with product and design teams to create elegant and intuitive user interfaces."
+      description: "Currently leading the development of a new design system and component library from the ground up. My work has resulted in a 40% increase in development velocity and has been praised by the design team for its elegance and intuitiveness."
     },
     {
       title: "Full-Stack Developer",
       company: "Tech Solutions",
       period: "2018 - 2021",
-      description: "Built and maintained scalable web applications for a diverse range of clients using React, Node.js, and PostgreSQL. Contributed to all phases of the development lifecycle, from concept to deployment."
+      description: "I built and maintained scalable web applications for a diverse range of clients using React, Node.js, and PostgreSQL. I was responsible for all phases of the development lifecycle, from concept and design to deployment and maintenance."
     },
     {
       title: "Junior Web Developer",
       company: "Digital Creations",
       period: "2016 - 2018",
-      description: "Assisted in the development and maintenance of client websites, primarily using HTML, CSS, and JavaScript. Gained foundational experience in version control with Git and agile methodologies."
+      description: "This was my first role in the industry, where I assisted in the development and maintenance of client websites, primarily using HTML, CSS, and JavaScript. I also gained foundational experience in version control with Git and agile methodologies."
     }
   ];
 
