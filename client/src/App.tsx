@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Projects from "@/pages/projects";
+import ProjectDetail from "@/pages/project-detail";
 import Chat from "@/pages/chat";
 import FloatingNav from "@/components/floating-nav";
 
@@ -18,6 +19,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
         <Route path="/projects" component={Projects} />
+        <Route path="/projects/:id" component={ProjectDetail} />
         <Route path="/chat" component={Chat} />
         <Route component={NotFound} />
       </Switch>

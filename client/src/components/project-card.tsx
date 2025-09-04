@@ -1,6 +1,7 @@
 import { ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Project } from "@shared/schema";
+import { Link } from "wouter";
 
 interface ProjectCardProps {
   project: Project;
@@ -10,10 +11,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const { title, description, imageUrl, technologies = [], demoUrl, githubUrl, id } = project;
 
   return (
-    <div className="project-card bg-card rounded-2xl overflow-hidden scroll-reveal border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <img 
-        src={imageUrl}
-        alt={`${title} - ${description}`}
+    <Link href={`/projects/${id}`} className="block">
+      <div className="project-card bg-card rounded-2xl overflow-hidden scroll-reveal border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+        <img
+          src={imageUrl}
+          alt={`${title} - ${description}`}
         className="w-full h-56 object-cover"
       />
       <div className="p-6">
@@ -74,5 +76,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </div>
     </div>
+    </Link>
   );
 }
