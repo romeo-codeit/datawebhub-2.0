@@ -93,6 +93,7 @@ export default function Avatar3D() {
         enableZoom={false}
         enablePan={false}
         enabled={false}
+        makeDefault
       />
     </Canvas>
       <Loader />
