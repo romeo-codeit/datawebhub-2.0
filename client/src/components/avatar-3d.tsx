@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useGLTF, OrbitControls, useAnimations, Loader, Environment } from '@react-three/drei'
+import { useGLTF, OrbitControls, useAnimations, Loader, Environment, AccumulativeShadows, RandomizedLight } from '@react-three/drei'
 import { Suspense, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import * as THREE from 'three'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
@@ -154,22 +154,23 @@ const Avatar3D = forwardRef((props, ref) => {
       */}
       <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }}>
         <Suspense fallback={null}>
-        <Environment preset="city" /> {/* Use a preset environment map for realistic lighting */}
-        <directionalLight
-          position={[3, 3, 3]}
-          intensity={5} // Increased intensity
-          color="#FFDDBB"
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          shadow-camera-far={15}
-        />
-        <directionalLight
-          position={[-3, 3, -3]}
-          intensity={3} // Increased intensity
-          color="#BBDDFF"
-        />
+        <Environment preset="studio" />
+        {/* Key light */}
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} />
+        {/* Fill light */}
+        <hemisphereLight intensity={0.5} groundColor="black" />
+        {/* Back light */}
+        <spotLight position={[-10, 10, -10]} angle={0.15} penumbra={1} intensity={1} />
         <Model ref={ref} />
+        <AccumulativeShadows
+          position={[0, -1.7, 0]}
+          frames={100}
+          alphaTest={0.85}
+          scale={10}
+          opacity={0.8}
+        >
+          <RandomizedLight amount={8} radius={5} intensity={0.5} ambient={0.5} position={[5, 5, -10]} />
+        </AccumulativeShadows>
         <EffectComposer>
           <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.9} height={300} />
         </EffectComposer>
