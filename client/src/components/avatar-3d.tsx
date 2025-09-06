@@ -152,30 +152,42 @@ const Avatar3D = forwardRef((props, ref) => {
         - `fov` (field of view) acts like zoom. A smaller `fov` is more zoomed in.
         - `gl={{ preserveDrawingBuffer: true }}` can help prevent flickering on route changes.
       */}
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }} onCreated={({ scene }) => scene.background = new THREE.Color('black')}>
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }} onCreated={({ scene }) => scene.background = new THREE.Color('#282828')}>
         <Suspense fallback={null}>
-        {/* Main spotlight focused on the face */}
+        {/* Key Light */}
         <spotLight
-          position={[2, 2, 5]}
-          angle={0.5}
+          position={[5, 5, 5]}
+          angle={0.3}
           penumbra={1}
-          intensity={4}
+          intensity={5}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
         />
-        {/* Dim ambient light */}
-        <hemisphereLight intensity={0.1} groundColor="black" />
+        {/* Fill Light */}
+        <spotLight
+          position={[-5, 2, 5]}
+          angle={0.3}
+          penumbra={1}
+          intensity={1}
+        />
+        {/* Rim Light */}
+        <spotLight
+          position={[0, 3, -5]}
+          angle={0.8}
+          penumbra={1}
+          intensity={3}
+        />
         <Model ref={ref} />
         <AccumulativeShadows
           position={[0, -1.7, 0]}
           frames={100}
           alphaTest={0.85}
           scale={10}
-          opacity={1}
+          opacity={0.7}
           color="#1c1c1c"
         >
-          <RandomizedLight amount={8} radius={5} intensity={1} ambient={0.5} position={[2, 2, 5]} />
+          <RandomizedLight amount={8} radius={5} intensity={0.8} ambient={0.5} position={[5, 5, 5]} />
         </AccumulativeShadows>
         <EffectComposer>
           <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.9} height={300} />
