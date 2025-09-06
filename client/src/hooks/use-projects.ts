@@ -4,7 +4,7 @@ import { Query } from "appwrite";
 import type { Project } from "@shared/schema";
 
 // IMPORTANT: Replace with your actual Appwrite Database ID
-const DATABASE_ID = 'YOUR_DATABASE_ID';
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID as string;
 const PROJECTS_COLLECTION_ID = 'projects';
 
 export function useProjects(category?: string) {

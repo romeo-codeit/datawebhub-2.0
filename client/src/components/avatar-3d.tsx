@@ -1,7 +1,8 @@
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useGLTF, OrbitControls, useAnimations, Loader } from '@react-three/drei'
+import { useGLTF, OrbitControls, useAnimations, Loader, Environment } from '@react-three/drei'
 import { Suspense, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import * as THREE from 'three'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
 
 const Model = forwardRef((props, ref) => {
   const group = useRef()
@@ -35,7 +36,7 @@ const Model = forwardRef((props, ref) => {
       const eyeLookDownLeft = headMesh.current.morphTargetDictionary['eyeLookDownLeft'];
       const eyeLookDownRight = headMesh.current.morphTargetDictionary['eyeLookDownRight'];
       const eyeLookInLeft = headMesh.current.morphTargetDictionary['eyeLookInLeft'];
-      const eyeLookInRight = headMesh.current.morphTargetDictionary['eyeLookInRight'];
+      const eyeLookInRight = headMesh.current.morphTargetInfluences[eyeLookInRight] = 0;
       const eyeLookOutLeft = headMesh.current.morphTargetDictionary['eyeLookOutLeft'];
       const eyeLookOutRight = headMesh.current.morphTargetDictionary['eyeLookOutRight'];
 
@@ -142,17 +143,7 @@ const Model = forwardRef((props, ref) => {
   );
 })
 
-export default function Avatar3D() {
-  const modelRef = useRef()
-
-  // Example of how to call playAnimation from the parent component
-  // This would be triggered by an event, e.g., when the AI starts speaking.
-  const handlePlayTalkAnimation = () => {
-    if (modelRef.current) {
-      modelRef.current.playAnimation('talk');
-    }
-  }
-
+const Avatar3D = forwardRef((props, ref) => {
   return (
     <>
       {/*
@@ -161,12 +152,12 @@ export default function Avatar3D() {
         - `fov` (field of view) acts like zoom. A smaller `fov` is more zoomed in.
         - `gl={{ preserveDrawingBuffer: true }}` can help prevent flickering on route changes.
       */}
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true }}>
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }}>
         <Suspense fallback={null}>
-        <ambientLight intensity={1.2} />
+        <Environment preset="city" /> {/* Use a preset environment map for realistic lighting */}
         <directionalLight
           position={[3, 3, 3]}
-          intensity={3.5}
+          intensity={5} // Increased intensity
           color="#FFDDBB"
           castShadow
           shadow-mapSize-width={2048}
@@ -175,11 +166,13 @@ export default function Avatar3D() {
         />
         <directionalLight
           position={[-3, 3, -3]}
-          intensity={2.5}
+          intensity={3} // Increased intensity
           color="#BBDDFF"
         />
-        <hemisphereLight groundColor="#000000" skyColor="#ffffff" intensity={1.5} />
-        <Model ref={modelRef} />
+        <Model ref={ref} />
+        <EffectComposer>
+          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.9} height={300} />
+        </EffectComposer>
       </Suspense>
       <OrbitControls
         // The target is now lowered to better frame the upper body
@@ -193,6 +186,8 @@ export default function Avatar3D() {
       <Loader />
     </>
   )
-}
+})
+
+export default Avatar3D;
 
 useGLTF.preload('/src/assets/my-avatar-.glb')

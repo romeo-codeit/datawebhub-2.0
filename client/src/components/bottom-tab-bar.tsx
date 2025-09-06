@@ -18,11 +18,9 @@ export default function BottomTabBar() {
           const Icon = item.icon;
           const isActive = location === item.href;
           return (
-            <Link key={item.href} href={item.href}>
-              <a className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors w-20 ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>
+            <Link key={item.href} href={item.href} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors w-20 ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>
                 <Icon className="w-5 h-5" />
                 <span className="text-xs font-medium">{item.label}</span>
-              </a>
             </Link>
           );
         })}

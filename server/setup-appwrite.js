@@ -77,6 +77,29 @@ async function setupAppwrite() {
       }
     }
 
+    // --- Create Chat Messages Collection ---
+    const chatMessagesCollectionId = 'chat_messages';
+    try {
+      console.log('Creating Chat Messages collection...');
+      await databases.createCollection(databaseId, chatMessagesCollectionId, 'Chat Messages', [
+        Permission.read(Role.any()),
+        Permission.create(Role.any()), // Allow anyone to create a chat message
+      ]);
+      console.log('Chat Messages collection created.');
+
+      console.log('Creating attributes for Chat Messages collection...');
+      await databases.createStringAttribute(databaseId, chatMessagesCollectionId, 'message', 10000, true);
+      await databases.createStringAttribute(databaseId, chatMessagesCollectionId, 'response', 10000, true);
+      await databases.createStringAttribute(databaseId, chatMessagesCollectionId, 'metadata', 10000, false); // Assuming metadata is a JSON string
+      console.log('Attributes for Chat Messages collection created.');
+    } catch (e) {
+      if (e.code === 409) {
+        console.log('Chat Messages collection already exists.');
+      } else {
+        throw e;
+      }
+    }
+
     // --- Seed Data ---
     console.log('Seeding data...');
 

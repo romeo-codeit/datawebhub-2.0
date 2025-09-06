@@ -6,17 +6,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const envPath = resolve(__dirname, '../.env');
 
-console.log(`Attempting to load .env file from: ${envPath}`);
+
 
 // Pass the debug option to config
-const result = config({ path: envPath, debug: true });
+const result = config({ path: envPath, debug: false });
 
 if (result.error) {
   console.error('Error loading .env file:', result.error);
 }
 
-console.log('.env file loaded. Parsed variables:', result.parsed);
-console.log('APPWRITE_PROJECT_ID from process.env:', process.env.APPWRITE_PROJECT_ID);
+
+
 
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";

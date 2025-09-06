@@ -11,13 +11,17 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const { title, description, imageUrl, technologies = [], demoUrl, id } = project;
 
   return (
-    <Link href={`/projects/${id}`} className="block">
-      <div className="project-card bg-card rounded-2xl overflow-hidden scroll-reveal border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+        <div className="project-card bg-card rounded-2xl overflow-hidden scroll-reveal border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+      <Link href={`/projects/${id}`} className="block">
         <img
           src={imageUrl}
           alt={`${title} - ${description}`}
-        className="w-full h-56 object-cover"
-      />
+          className="w-full h-56 object-cover"
+          onError={(e) => {
+            e.currentTarget.src = `https://placehold.co/400x300?text=${title}`;
+          }}
+        />
+      </Link>
       <div className="p-6">
         <h3 
           className="font-heading text-lg md:text-xl font-bold text-card-foreground mb-2"
@@ -63,6 +67,5 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </div>
     </div>
-    </Link>
   );
 }

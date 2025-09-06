@@ -1,6 +1,18 @@
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const envPath = resolve(__dirname, '../../.env');
+
+const result = config({ path: envPath, debug: false });
+if (result.error) {
+  console.error('Error loading .env:', result.error);
+}
+
 import { Client, Databases, Users, Storage } from 'node-appwrite';
 
-// Make sure to set these environment variables in your .env file
 const endpoint = process.env.APPWRITE_ENDPOINT;
 const projectId = process.env.APPWRITE_PROJECT_ID;
 const apiKey = process.env.APPWRITE_API_KEY;
@@ -17,7 +29,7 @@ client
 
 export const databases = new Databases(client);
 export const users = new Users(client);
-export const storageService = new Storage(client); // Renamed to avoid conflict with local storage variable
+export const storageService = new Storage(client);
 
 export const DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
 

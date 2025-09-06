@@ -17,7 +17,7 @@ export interface IStorage {
   deleteProject(id: string): Promise<boolean>;
 
   // Chat methods
-  getChatMessages(): Promise<ChatMessage[]>;
+  getChatMessages(sessionId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
 
   // Prompt methods
@@ -117,16 +117,20 @@ export class MemStorage implements IStorage {
     return this.projects.delete(id);
   }
 
-  async getChatMessages(): Promise<ChatMessage[]> {
-    return Array.from(this.chatMessages.values()).sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
+  async getChatMessages(sessionId: string): Promise<ChatMessage[]> {
+    const messages = Array.from(this.chatMessages.values())
+      .filter(message => message.sessionId === sessionId) // Add filtering
+      .sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+    return messages;
   }
 
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
     const id = randomUUID();
     const message: ChatMessage = {
       id,
+      sessionId: insertMessage.sessionId,
       message: insertMessage.message,
       response: insertMessage.response,
       metadata: insertMessage.metadata || null,

@@ -7,7 +7,6 @@ import passport from "passport";
 import type { Request, Response, NextFunction } from "express";
 import multer from "multer";
 import Groq from "groq-sdk";
-
 const upload = multer({ storage: multer.memoryStorage() });
 
 function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
@@ -38,6 +37,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projects = await storage.getProjects();
       res.json(projects);
     } catch (error) {
+      console.error("Error fetching projects:", error);
       res.status(500).json({ message: "Failed to fetch projects" });
     }
   });
@@ -131,27 +131,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat routes
-  app.get("/api/chat/messages", async (_req, res) => {
+  app.get("/api/chat/messages", async (req, res) => {
     try {
-      const messages = await storage.getChatMessages();
+      const { sessionId } = req.query;
+      if (!sessionId || typeof sessionId !== 'string') {
+        return res.status(400).json({ message: "sessionId is required" });
+      }
+      const messages = await storage.getChatMessages(sessionId);
       res.json(messages);
     } catch (error) {
+      console.error("Error fetching chat messages:", error);
       res.status(500).json({ message: "Failed to fetch chat messages" });
     }
   });
 
   app.post("/api/chat", async (req, res) => {
     try {
-      const { message, prompts } = req.body;
+      const { message, prompts, sessionId } = req.body;
       if (!message || typeof message !== 'string') {
         return res.status(400).json({ message: "Message is required" });
+      }
+      if (!sessionId || typeof sessionId !== 'string') {
+        return res.status(400).json({ message: "sessionId is required" });
       }
 
       const groq = new Groq({
         apiKey: process.env.GROQ_API_KEY,
       });
 
-      const systemPrompts = prompts.map((p: any) => ({
+      const systemPrompts = (prompts || []).map((p: any) => ({
         role: "system",
         content: p.promptText,
       }));
@@ -161,21 +169,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...systemPrompts,
           { role: "user", content: message },
         ],
-        model: "llama3-8b-8192",
+        model: "llama-3.1-8b-instant",
       });
 
       const response = chatCompletion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
+      console.log('Groq response:', response);
+      console.log('Groq response type:', typeof response);
 
-      // TODO: You can add logic here to determine the animation and emotion based on the response
-      const animationData = { animation: "talk", emotion: "neutral" };
+      // Voice RSS Text-to-Speech
+      const voiceRSSApiKey = process.env.VOICE_RSS_API_KEY;
+      let audioContent = null;
+
+      if (voiceRSSApiKey) {
+        const ttsResponse = await fetch(`https://api.voicerss.org/?key=${voiceRSSApiKey}&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`);
+        if (ttsResponse.ok) {
+          const audioBuffer = await ttsResponse.arrayBuffer();
+          audioContent = Buffer.from(audioBuffer).toString('base64');
+        } else {
+          console.error("Voice RSS TTS API Error:", await ttsResponse.text());
+        }
+      } else {
+        console.warn("VOICE_RSS_API_KEY not set. Skipping TTS.");
+      }
+
+      const animationData = { animation: "talking", emotion: "neutral" };
+      const metadataString = JSON.stringify(animationData);
+      console.log('Metadata string:', metadataString, 'Length:', metadataString.length);
+      if (metadataString.length > 500) {
+        return res.status(400).json({ message: "Metadata too long" });
+      }
 
       const chatMessage = await storage.createChatMessage({
+        sessionId,
         message,
         response,
-        metadata: animationData,
+        metadata: metadataString,
       });
 
-      res.json(chatMessage);
+      res.json({ chatMessage, audioContent });
     } catch (error) {
       console.error("Error processing chat message:", error);
       if (error instanceof z.ZodError) {
@@ -199,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/prompts", ensureAuthenticated, async (_req, res) => {
+  app.get("/api/prompts", async (_req, res) => {
     try {
       const prompts = await storage.getPrompts();
       res.json(prompts);
@@ -232,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!deleted) {
         return res.status(404).json({ message: "Prompt not found" });
       }
-      res.json({ message: "Prompt deleted successfully" });
+      res.json({ message: "Project deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete prompt" });
     }

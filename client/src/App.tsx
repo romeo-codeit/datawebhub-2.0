@@ -13,6 +13,8 @@ import LoginPage from "@/pages/admin/login";
 import DashboardPage from "@/pages/admin/dashboard";
 import FloatingNav from "@/components/floating-nav";
 import BottomTabBar from "@/components/bottom-tab-bar";
+import { useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 function Router() {
   return (
@@ -34,6 +36,12 @@ function Router() {
 }
 
 function App() {
+  useEffect(() => {
+    if (!localStorage.getItem('sessionId')) {
+      localStorage.setItem('sessionId', uuidv4());
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

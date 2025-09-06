@@ -37,6 +37,7 @@ export interface InsertProject {
 // Appwrite ChatMessage types
 export interface ChatMessage {
   $id: string; // Appwrite document ID
+  sessionId: string;
   message: string;
   response: string;
   metadata?: any; // for storing animation data, emotion, etc.
@@ -45,6 +46,7 @@ export interface ChatMessage {
 }
 
 export interface InsertChatMessage {
+  sessionId: string;
   message: string;
   response: string;
   metadata?: any;
@@ -88,7 +90,8 @@ export const insertProjectSchema = z.object({
 });
 
 export const insertChatMessageSchema = z.object({
-  message: z.string().min(1, "Message is required."),
-  response: z.string().min(1, "Response is required."),
-  metadata: z.any().optional(),
+  sessionId: z.string(),
+  message: z.string(),
+  response: z.string().optional(),
+  metadata: z.string().max(500).optional(),
 });

@@ -1,9 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, RefreshCw } from "lucide-react";
 import ChatInterface from "@/components/chat-interface";
 import { useChat } from "@/hooks/use-chat";
+import { usePrompts } from "@/hooks/use-prompts";
 import Avatar3D from "@/components/avatar-3d";
 
 export default function Chat() {
@@ -17,31 +18,51 @@ export default function Chat() {
     error 
   } = useChat();
 
+  const { data: prompts, isLoading: isLoadingPrompts } = usePrompts();
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.response && modelRef.current) {
+      try {
+        const metadata = JSON.parse(lastMessage.metadata);
+        if (metadata && metadata.animation) {
+          modelRef.current.playAnimation(metadata.animation);
+        }
+      } catch (e) {
+        console.error("Failed to parse message metadata:", e);
+      }
+    }
+  }, [messages]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim() || isLoading) return;
+    if (!message.trim() || isLoading || isLoadingPrompts) return;
 
     const userMessage = message.trim();
     setMessage("");
-
-    if (modelRef.current) {
-      modelRef.current.playAnimation('talk');
-    }
     
     try {
-      await sendMessage(userMessage);
+      await sendMessage(userMessage, prompts || []);
     } catch (err) {
       console.error("Failed to send message:", err);
     }
   };
 
+  const handleNewChat = () => {
+    localStorage.removeItem('sessionId');
+    window.location.reload();
+  };
+
   return (
     <section id="chat" className="py-24 sm:py-32 bg-background min-h-screen">
       <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 relative">
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground mb-4">
             AI <span className="text-primary">Chat</span>
           </h2>
+          <Button onClick={handleNewChat} variant="outline" size="icon" className="absolute top-0 right-0 m-4">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Chat with my AI assistant powered by advanced language models. Ask about my work, skills, or anything else!
           </p>
@@ -71,13 +92,13 @@ export default function Chat() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="flex-1 h-12 px-4 rounded-lg"
-                    disabled={isLoading}
+                    disabled={isLoading || isLoadingPrompts}
                     data-testid="input-chat-message"
                   />
                   <Button
                     type="submit"
                     size="icon"
-                    disabled={!message.trim() || isLoading}
+                    disabled={!message.trim() || isLoading || isLoadingPrompts}
                     className="h-12 w-12 rounded-lg"
                     data-testid="button-send-message"
                   >

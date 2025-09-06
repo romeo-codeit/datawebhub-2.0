@@ -3,16 +3,63 @@ import { DATABASE_ID } from './lib/appwrite';
 import { ID, Query } from 'node-appwrite';
 import type { User, InsertUser, Project, InsertProject, ChatMessage, InsertChatMessage, Prompt, InsertPrompt } from '@shared/schema';
 import { IStorage } from './storage';
+import { Models } from 'node-appwrite';
 
 const PROJECTS_COLLECTION_ID = 'projects';
 const PROMPTS_COLLECTION_ID = 'prompts';
-const CHAT_MESSAGES_COLLECTION_ID = 'chat_messages'; // Assuming you have a collection for chat messages
+const CHAT_MESSAGES_COLLECTION_ID = 'chat_messages';
+
+// Helper function to map Appwrite document to Project type
+function mapDocumentToProject(doc: Models.Document): Project {
+  return {
+    $id: doc.$id,
+    title: doc.title,
+    description: doc.description,
+    category: doc.category,
+    technologies: doc.technologies,
+    imageUrl: doc.imageUrl,
+    demoUrl: doc.demoUrl,
+    $createdAt: doc.$createdAt,
+    $updatedAt: doc.$updatedAt,
+  };
+}
+
+// Helper function to map Appwrite document to ChatMessage type
+function mapDocumentToChatMessage(doc: Models.Document): ChatMessage {
+  let metadata;
+  try {
+    metadata = JSON.parse(doc.metadata);
+  } catch (error) {
+    console.error('Error parsing metadata:', error);
+    metadata = { animation: "talk", emotion: "neutral" }; // Fallback
+  }
+  return {
+    $id: doc.$id,
+    sessionId: doc.sessionId,
+    message: doc.message,
+    response: doc.response,
+    metadata,
+    $createdAt: doc.$createdAt,
+    $updatedAt: doc.$updatedAt,
+  };
+}
+
+// Helper function to map Appwrite document to Prompt type
+function mapDocumentToPrompt(doc: Models.Document): Prompt {
+  return {
+    $id: doc.$id,
+    promptText: doc.promptText,
+    promptType: doc.promptType,
+    isActive: doc.isActive,
+    $createdAt: doc.$createdAt,
+    $updatedAt: doc.$updatedAt,
+  };
+}
 
 export class AppwriteStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     try {
       const appwriteUser = await users.get(id);
-      // Map Appwrite user to your User type
       return {
         id: appwriteUser.$id,
         username: appwriteUser.email || appwriteUser.name || '',
@@ -28,9 +75,8 @@ export class AppwriteStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     try {
-      // Appwrite users.list() can filter by email
       const response = await users.list([
-        Query.equal('email', username) // Assuming username is stored as email
+        Query.equal('email', username)
       ]);
       if (response.users.length > 0) {
         const appwriteUser = response.users[0];
@@ -50,9 +96,9 @@ export class AppwriteStorage implements IStorage {
     try {
       const appwriteUser = await users.create(
         ID.unique(),
-        insertUser.username, // Assuming username is used as email
+        insertUser.username,
         insertUser.password,
-        insertUser.username // Assuming username is also used as name
+        insertUser.username
       );
       return {
         id: appwriteUser.$id,
@@ -67,29 +113,27 @@ export class AppwriteStorage implements IStorage {
   // Project methods
   async getProjects(): Promise<Project[]> {
     const response = await databases.listDocuments(DATABASE_ID, PROJECTS_COLLECTION_ID, [
-      Query.orderDesc('createdAt') // Sort by createdAt to match MemStorage
+      Query.orderDesc('$createdAt')
     ]);
-    return response.documents as unknown as Project[];
+    return response.documents.map(mapDocumentToProject);
   }
 
   async getProjectsByCategory(category: string): Promise<Project[]> {
     const response = await databases.listDocuments(DATABASE_ID, PROJECTS_COLLECTION_ID, [
       Query.equal('category', category),
-      Query.orderDesc('createdAt') // Sort by createdAt
+      Query.orderDesc('$createdAt')
     ]);
-    return response.documents as unknown as Project[];
+    return response.documents.map(mapDocumentToProject);
   }
 
   async getFeaturedProjects(): Promise<Project[]> {
-    // This method is no longer needed as 'isFeatured' attribute was removed.
-    // You can implement a different logic for featured projects if needed, e.g., using a tag.
     return [];
   }
 
   async getProject(id: string): Promise<Project | undefined> {
     try {
       const response = await databases.getDocument(DATABASE_ID, PROJECTS_COLLECTION_ID, id);
-      return response as unknown as Project;
+      return mapDocumentToProject(response);
     } catch (error: any) {
       if (error.code === 404) {
         return undefined;
@@ -105,7 +149,7 @@ export class AppwriteStorage implements IStorage {
       ID.unique(),
       project
     );
-    return response as unknown as Project;
+    return mapDocumentToProject(response);
   }
 
   async updateProject(id: string, project: Partial<InsertProject>): Promise<Project> {
@@ -115,7 +159,7 @@ export class AppwriteStorage implements IStorage {
       id,
       project
     );
-    return response as unknown as Project;
+    return mapDocumentToProject(response);
   }
 
   async deleteProject(id: string): Promise<boolean> {
@@ -124,21 +168,25 @@ export class AppwriteStorage implements IStorage {
   }
 
   // Chat methods
-  async getChatMessages(): Promise<ChatMessage[]> {
+  async getChatMessages(sessionId: string): Promise<ChatMessage[]> {
     const response = await databases.listDocuments(DATABASE_ID, CHAT_MESSAGES_COLLECTION_ID, [
-        Query.orderAsc('createdAt') // Sort by createdAt to match MemStorage
+        Query.equal('sessionId', sessionId),
+        Query.orderAsc('$createdAt')
     ]);
-    return response.documents as unknown as ChatMessage[];
+    return response.documents.map(mapDocumentToChatMessage);
   }
 
   async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
+    console.log('createChatMessage input:', JSON.stringify(message, null, 2));
+    console.log('DATABASE_ID:', DATABASE_ID);
+    console.log('CHAT_MESSAGES_COLLECTION_ID:', CHAT_MESSAGES_COLLECTION_ID);
     const response = await databases.createDocument(
       DATABASE_ID,
       CHAT_MESSAGES_COLLECTION_ID,
       ID.unique(),
       message
     );
-    return response as unknown as ChatMessage;
+    return mapDocumentToChatMessage(response);
   }
 
   // Prompt methods
@@ -149,14 +197,14 @@ export class AppwriteStorage implements IStorage {
       ID.unique(),
       prompt
     );
-    return response as unknown as Prompt;
+    return mapDocumentToPrompt(response);
   }
 
   async getPrompts(): Promise<Prompt[]> {
     const response = await databases.listDocuments(DATABASE_ID, PROMPTS_COLLECTION_ID, [
-        Query.orderAsc('$createdAt') // Sort by creation date
+        Query.orderAsc('$createdAt')
     ]);
-    return response.documents as unknown as Prompt[];
+    return response.documents.map(mapDocumentToPrompt);
   }
 
   async updatePrompt(id: string, prompt: Partial<InsertPrompt>): Promise<Prompt> {
@@ -166,7 +214,7 @@ export class AppwriteStorage implements IStorage {
       id,
       prompt
     );
-    return response as unknown as Prompt;
+    return mapDocumentToPrompt(response);
   }
 
   async deletePrompt(id: string): Promise<boolean> {
@@ -176,18 +224,16 @@ export class AppwriteStorage implements IStorage {
 
   // File methods
   async uploadFile(file: File): Promise<string> {
-    // IMPORTANT: Replace 'default' with your actual Appwrite Storage Bucket ID
     const response = await storageService.createFile(
       'default', 
       ID.unique(),
       file
     );
-    return response.$id; // Return file ID
+    return response.$id;
   }
 
   getFileUrl(fileId: string): string {
-    // IMPORTANT: Replace 'default' with your actual Appwrite Storage Bucket ID
     const url = storageService.getFileDownload('default', fileId);
-    return url;
+    return url.toString();
   }
 }
