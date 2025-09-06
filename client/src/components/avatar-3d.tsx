@@ -36,7 +36,7 @@ const Model = forwardRef((props, ref) => {
       const eyeLookDownLeft = headMesh.current.morphTargetDictionary['eyeLookDownLeft'];
       const eyeLookDownRight = headMesh.current.morphTargetDictionary['eyeLookDownRight'];
       const eyeLookInLeft = headMesh.current.morphTargetDictionary['eyeLookInLeft'];
-      const eyeLookInRight = headMesh.current.morphTargetInfluences[eyeLookInRight] = 0;
+      const eyeLookInRight = headMesh.current.morphTargetDictionary['eyeLookInRight'];
       const eyeLookOutLeft = headMesh.current.morphTargetDictionary['eyeLookOutLeft'];
       const eyeLookOutRight = headMesh.current.morphTargetDictionary['eyeLookOutRight'];
 

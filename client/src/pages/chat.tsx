@@ -5,7 +5,8 @@ import { Send, Loader2, RefreshCw } from "lucide-react";
 import ChatInterface from "@/components/chat-interface";
 import { useChat } from "@/hooks/use-chat";
 import { usePrompts } from "@/hooks/use-prompts";
-import Avatar3D from "@/components/avatar-3d";
+import { lazy, Suspense } from "react";
+const Avatar3D = lazy(() => import("@/components/avatar-3d"));
 
 export default function Chat() {
   const [message, setMessage] = useState("");
@@ -72,7 +73,9 @@ export default function Chat() {
           <div className="bg-card border rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row h-[85vh]">
             {/* Avatar Section */}
             <div className="md:w-2/5 bg-secondary border-b md:border-b-0 md:border-r h-64 md:h-auto">
-              <Avatar3D ref={modelRef} />
+              <Suspense fallback={<div className="w-full h-full flex justify-center items-center"><Loader2 className="w-16 h-16 animate-spin" /></div>}>
+                <Avatar3D ref={modelRef} />
+              </Suspense>
             </div>
 
             {/* Chat Section */}
