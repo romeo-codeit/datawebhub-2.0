@@ -152,24 +152,30 @@ const Avatar3D = forwardRef((props, ref) => {
         - `fov` (field of view) acts like zoom. A smaller `fov` is more zoomed in.
         - `gl={{ preserveDrawingBuffer: true }}` can help prevent flickering on route changes.
       */}
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }}>
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }} onCreated={({ scene }) => scene.background = new THREE.Color('black')}>
         <Suspense fallback={null}>
-        <Environment preset="studio" />
-        {/* Key light */}
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} />
-        {/* Fill light */}
-        <hemisphereLight intensity={0.5} groundColor="black" />
-        {/* Back light */}
-        <spotLight position={[-10, 10, -10]} angle={0.15} penumbra={1} intensity={1} />
+        {/* Main spotlight focused on the face */}
+        <spotLight
+          position={[2, 2, 5]}
+          angle={0.5}
+          penumbra={1}
+          intensity={4}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+        />
+        {/* Dim ambient light */}
+        <hemisphereLight intensity={0.1} groundColor="black" />
         <Model ref={ref} />
         <AccumulativeShadows
           position={[0, -1.7, 0]}
           frames={100}
           alphaTest={0.85}
           scale={10}
-          opacity={0.8}
+          opacity={1}
+          color="#1c1c1c"
         >
-          <RandomizedLight amount={8} radius={5} intensity={0.5} ambient={0.5} position={[5, 5, -10]} />
+          <RandomizedLight amount={8} radius={5} intensity={1} ambient={0.5} position={[2, 2, 5]} />
         </AccumulativeShadows>
         <EffectComposer>
           <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.9} height={300} />
