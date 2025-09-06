@@ -1,4 +1,4 @@
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, OrbitControls, useAnimations, Loader, Environment, AccumulativeShadows, RandomizedLight } from '@react-three/drei'
 import { Suspense, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import * as THREE from 'three'
@@ -124,13 +124,6 @@ const Model = forwardRef((props, ref) => {
 
   // We only need an effect to ensure all meshes in the model can cast shadows.
   // The positioning and scaling is now handled declaratively in the JSX below.
-  useEffect(() => {
-    scene.traverse((obj) => {
-      if (obj.isMesh) {
-        obj.castShadow = true;
-      }
-    });
-  }, [scene]);
 
   // By wrapping the model in a group and applying transformations here,
   // we ensure the position is fixed and doesn't shift on page navigation.
@@ -152,43 +145,37 @@ const Avatar3D = forwardRef((props, ref) => {
         - `fov` (field of view) acts like zoom. A smaller `fov` is more zoomed in.
         - `gl={{ preserveDrawingBuffer: true }}` can help prevent flickering on route changes.
       */}
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }} onCreated={({ scene }) => scene.background = new THREE.Color('#282828')}>
-        <Suspense fallback={null}>
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }}>
+        <ambientLight intensity={0.3} />
+        <GradientBackground />
         {/* Key Light */}
         <spotLight
           position={[5, 5, 5]}
           angle={0.3}
           penumbra={1}
-          intensity={5}
-          castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
+          intensity={3.0}
+          color="#fff4e5"
+          target-position={[0, 1, 0]}
         />
         {/* Fill Light */}
         <spotLight
           position={[-5, 2, 5]}
           angle={0.3}
           penumbra={1}
-          intensity={1}
+          intensity={1.2}
+          color="#dbe9ff"
+          target-position={[0, 1, 0]}
         />
         {/* Rim Light */}
         <spotLight
           position={[0, 3, -5]}
           angle={0.8}
           penumbra={1}
-          intensity={3}
+          intensity={2.0}
+          color="white"
+          target-position={[0, 1, 0]}
         />
         <Model ref={ref} />
-        <AccumulativeShadows
-          position={[0, -1.7, 0]}
-          frames={100}
-          alphaTest={0.85}
-          scale={10}
-          opacity={0.7}
-          color="#1c1c1c"
-        >
-          <RandomizedLight amount={8} radius={5} intensity={0.8} ambient={0.5} position={[5, 5, 5]} />
-        </AccumulativeShadows>
         <EffectComposer>
           <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.9} height={300} />
         </EffectComposer>
@@ -210,3 +197,34 @@ const Avatar3D = forwardRef((props, ref) => {
 export default Avatar3D;
 
 useGLTF.preload('/src/assets/my-avatar-.glb')
+
+const GradientBackground = () => {
+  const { viewport } = useThree();
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      color1: { value: new THREE.Color('#0f0f0f') },
+      color2: { value: new THREE.Color('#2b2b2b') },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 color1;
+      uniform vec3 color2;
+      varying vec2 vUv;
+      void main() {
+        gl_FragColor = vec4(mix(color1, color2, vUv.y), 1.0);
+      }
+    `,
+  });
+
+  return (
+    <mesh material={material} position={[0, 0, -10]}>
+      <planeGeometry args={[viewport.width, viewport.height]} />
+    </mesh>
+  );
+};
