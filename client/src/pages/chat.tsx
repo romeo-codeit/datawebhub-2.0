@@ -12,7 +12,6 @@ export default function Chat() {
   const [message, setMessage] = useState("");
   const [currentAnimation, setCurrentAnimation] = useState<string | undefined>(undefined);
   const [currentMorphTargets, setCurrentMorphTargets] = useState<{ [key: string]: number } | undefined>(undefined);
-  const modelRef = useRef();
   
   const { 
     messages, 
@@ -81,7 +80,7 @@ export default function Chat() {
             {/* Avatar Section */}
             <div className="md:w-2/5 bg-secondary border-b md:border-b-0 md:border-r h-64 md:h-auto">
               <Suspense fallback={<div className="w-full h-full flex justify-center items-center"><Loader2 className="w-16 h-16 animate-spin" /></div>}>
-                <Avatar3D ref={modelRef} currentAnimation={currentAnimation} currentMorphTargets={currentMorphTargets} />
+                <Avatar3D currentAnimation={currentAnimation} currentMorphTargets={currentMorphTargets} />
               </Suspense>
             </div>
 

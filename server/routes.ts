@@ -218,44 +218,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return "idle"; // Default to idle if no response
       };
 
-      // Function to determine morph targets based on response content (placeholder for advanced lip-sync)
+      // Function to determine morph targets based on response content
       const getMorphTargetsFromResponse = (text: string) => {
         const lowerText = text.toLowerCase();
-        let emotion: 'neutral' | 'curious' | 'amused' = 'neutral';
-
-        // Basic sentiment inference based on keywords
-        if (lowerText.includes("curious") || lowerText.includes("wonder") || lowerText.includes("question")) {
-          emotion = 'curious';
-        } else if (lowerText.includes("funny") || lowerText.includes("amused") || lowerText.includes("haha")) {
-          emotion = 'amused';
-        }
-
-        // Base talking morph targets
         let morphTargets: { [key: string]: number } = {};
+
+        // Base talking morphs if there is text
         if (text.length > 0) {
-          morphTargets = {
-            jawOpen: 0.3, // Simulate mouth opening for talking
-            mouthPucker: 0.1, // Slight pucker
-          };
+            morphTargets = {
+                jawOpen: 0.25, // Slightly open jaw for talking
+                mouthPucker: 0.1,
+            };
         }
 
-        // Apply emotion-specific morph targets
-        switch (emotion) {
-          case 'curious':
-            morphTargets.browInnerUp = 0.4; // Raise inner brows
-            morphTargets.eyeWideLeft = 0.2; // Slightly widen eyes
-            morphTargets.eyeWideRight = 0.2;
-            break;
-          case 'amused':
-            morphTargets.mouthSmileLeft = 0.5; // Smile
-            morphTargets.mouthSmileRight = 0.5;
-            morphTargets.cheekSquintLeft = 0.3; // Squint cheeks slightly
-            morphTargets.cheekSquintRight = 0.3;
-            break;
-          case 'neutral':
-          default:
-            // No additional morph targets for neutral, or reset if needed
-            break;
+        // Emotion detection - can layer on top of talking morphs
+        const emotionMap = [
+            {
+                keywords: ['happy', 'great', 'awesome', 'fantastic', 'joy', 'funny', 'amused', 'haha', 'lol'],
+                morphs: { mouthSmileLeft: 0.6, mouthSmileRight: 0.6, cheekSquintLeft: 0.3, cheekSquintRight: 0.3 }
+            },
+            {
+                keywords: ['sad', 'sorry', 'unfortunate', 'unfortunately', 'apologize'],
+                morphs: { mouthFrownLeft: 0.5, mouthFrownRight: 0.5, browInnerUp: 0.3 }
+            },
+            {
+                keywords: ['angry', 'frustrated', 'annoyed'],
+                morphs: { browDownLeft: 0.8, browDownRight: 0.8, mouthPressLeft: 0.5, mouthPressRight: 0.5, noseSneerLeft: 0.4 }
+            },
+            {
+                keywords: ['wow', 'whoa', 'really', 'surprise', 'incredible'],
+                morphs: { eyeWideLeft: 0.5, eyeWideRight: 0.5, jawOpen: 0.4, browInnerUp: 0.6 }
+            },
+            {
+                keywords: ['curious', 'wonder', 'question', 'what', 'how', 'why', '?'],
+                morphs: { browInnerUp: 0.5, eyeWideLeft: 0.15, eyeWideRight: 0.15 }
+            },
+            {
+                keywords: ['think', 'hmm', 'let me see', 'consider'],
+                morphs: { eyeLookUpLeft: 0.6, eyeLookUpRight: 0.6, browDownLeft: 0.2, browDownRight: 0.2 }
+            }
+        ];
+
+        // Find the first matching emotion and apply its morphs
+        for (const emotion of emotionMap) {
+            if (emotion.keywords.some(keyword => lowerText.includes(keyword))) {
+                Object.assign(morphTargets, emotion.morphs);
+                break; // Stop after the first match to avoid conflicting expressions
+            }
         }
 
         return morphTargets;
@@ -267,20 +276,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Voice RSS Text-to-Speech
       const voiceRSSApiKey = process.env.VOICE_RSS_API_KEY;
       let audioContent = null;
+      let ttsError = null;
 
       if (voiceRSSApiKey) {
-        const ttsResponse = await fetch(`https://voicerss.org/api/?key=${voiceRSSApiKey}&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`);
-        if (ttsResponse.ok) {
-          const audioBuffer = await ttsResponse.arrayBuffer();
-          audioContent = Buffer.from(audioBuffer).toString('base64');
-        } else {
-          console.error("Voice RSS TTS API Error:", await ttsResponse.text());
+        try {
+          const ttsResponse = await fetch(`https://voicerss.org/api/?key=${voiceRSSApiKey}&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`);
+          if (ttsResponse.ok) {
+            const audioBuffer = await ttsResponse.arrayBuffer();
+            audioContent = Buffer.from(audioBuffer).toString('base64');
+          } else {
+            const errorText = await ttsResponse.text();
+            console.error("Voice RSS TTS API Error:", errorText);
+            // This is a specific error from VoiceRSS for invalid keys or other issues
+            if (errorText.includes("API key") || errorText.includes("Invalid")) {
+                ttsError = "The Voice RSS API key is invalid or missing. Please check your environment variables.";
+            } else {
+                ttsError = `TTS Error: ${errorText}`;
+            }
+          }
+        } catch (err) {
+          console.error("Network or other error during TTS request:", err);
+          ttsError = "Could not connect to the TTS service.";
         }
       } else {
         console.warn("VOICE_RSS_API_KEY not set. Skipping TTS.");
+        ttsError = "Voice RSS API key is not set in the environment variables. Skipping TTS.";
       }
 
-      const metadata = { animation, morphTargets };
+      const metadata = { animation, morphTargets, ttsError };
       const metadataString = JSON.stringify(metadata);
       console.log('Metadata string:', metadataString, 'Length:', metadataString.length);
       if (metadataString.length > 500) {

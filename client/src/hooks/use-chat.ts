@@ -2,11 +2,13 @@ import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { ChatMessage, Prompt } from "@shared/schema";
+import { useToast } from "@/components/ui/use-toast"; // Corrected path
 
 export function useChat() {
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const sessionId = localStorage.getItem('sessionId');
+  const { toast } = useToast();
 
   // Fetch existing chat messages
   const { data: messages = [], isLoading: isLoadingMessages } = useQuery<ChatMessage[]>({
@@ -27,22 +29,44 @@ export function useChat() {
       const response = await apiRequest('POST', '/api/chat', { message, prompts, sessionId });
       return response.json();
     },
-    onSuccess: (data: { chatMessage: ChatMessage, audioContent: string | null }) => {
-      const { chatMessage, audioContent } = data;
+    onSuccess: (data: { chatMessage: ChatMessage, audioContent: string | null, ttsError?: string | null }) => {
+      const { chatMessage, audioContent, ttsError } = data;
+
       // Update the cache with the new message
       queryClient.setQueryData<ChatMessage[]>(['/api/chat/messages', sessionId], (oldMessages = []) => {
         return [...oldMessages, chatMessage];
       });
       setError(null);
 
+      // Display TTS error as a toast notification if it exists
+      if (ttsError) {
+        toast({
+          title: "TTS Error",
+          description: ttsError,
+          variant: "destructive",
+        });
+      }
+
       // Play audio if available
       if (audioContent) {
         const audio = new Audio(`data:audio/mp3;base64,${audioContent}`);
-        audio.play().catch(e => console.error("Error playing audio:", e));
+        audio.play().catch(e => {
+          console.error("Error playing audio:", e);
+          toast({
+            title: "Audio Playback Error",
+            description: "Could not play the generated audio.",
+            variant: "destructive",
+          });
+        });
       }
     },
     onError: (err: Error) => {
       setError(err.message || 'Failed to send message');
+      toast({
+        title: "Error",
+        description: err.message || 'Failed to send message',
+        variant: "destructive",
+      });
     },
   });
 
