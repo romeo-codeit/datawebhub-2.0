@@ -176,12 +176,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Groq response:', response);
       console.log('Groq response type:', typeof response);
 
+      // Function to determine animation based on response content
+      const getAnimationFromResponse = (text: string) => {
+        const lowerText = text.toLowerCase();
+        
+        // Define a map of keywords to animations, ordered by specificity (longer phrases first)
+        const animationMap = new Map<string, string>([
+          ["playing golf", "playing golf"],
+          ["salsa dance", "salsa dance"],
+          ["looking behind", "looking behind"],
+          ["nods head", "nods head"],
+          ["shakes head", "shakes head"],
+          ["cheering", "cheering"],
+          ["punching", "punching"],
+          ["stretching", "stretching"],
+          ["waving", "waving"],
+          ["hello", "waving"],
+          ["hi", "waving"],
+          ["golf", "playing golf"],
+          ["cheer", "cheering"],
+          ["great", "cheering"],
+          ["yes", "nods head"],
+          ["affirmative", "nods head"],
+          ["no", "shakes head"],
+          ["negative", "shakes head"],
+          ["dance", "salsa dance"],
+          ["punch", "punching"],
+          ["stretch", "stretching"],
+        ]);
+
+        // Sort keywords by length in descending order to prioritize more specific phrases
+        const sortedKeywords = Array.from(animationMap.keys()).sort((a, b) => b.length - a.length);
+
+        for (const keyword of sortedKeywords) {
+          if (lowerText.includes(keyword)) {
+            return animationMap.get(keyword);
+          }
+        }
+
+        if (text.length > 0) return "talking"; // Default to talking if there's a response
+        return "idle"; // Default to idle if no response
+      };
+
+      // Function to determine morph targets based on response content (placeholder for advanced lip-sync)
+      const getMorphTargetsFromResponse = (text: string) => {
+        const lowerText = text.toLowerCase();
+        let emotion: 'neutral' | 'curious' | 'amused' = 'neutral';
+
+        // Basic sentiment inference based on keywords
+        if (lowerText.includes("curious") || lowerText.includes("wonder") || lowerText.includes("question")) {
+          emotion = 'curious';
+        } else if (lowerText.includes("funny") || lowerText.includes("amused") || lowerText.includes("haha")) {
+          emotion = 'amused';
+        }
+
+        // Base talking morph targets
+        let morphTargets: { [key: string]: number } = {};
+        if (text.length > 0) {
+          morphTargets = {
+            jawOpen: 0.3, // Simulate mouth opening for talking
+            mouthPucker: 0.1, // Slight pucker
+          };
+        }
+
+        // Apply emotion-specific morph targets
+        switch (emotion) {
+          case 'curious':
+            morphTargets.browInnerUp = 0.4; // Raise inner brows
+            morphTargets.eyeWideLeft = 0.2; // Slightly widen eyes
+            morphTargets.eyeWideRight = 0.2;
+            break;
+          case 'amused':
+            morphTargets.mouthSmileLeft = 0.5; // Smile
+            morphTargets.mouthSmileRight = 0.5;
+            morphTargets.cheekSquintLeft = 0.3; // Squint cheeks slightly
+            morphTargets.cheekSquintRight = 0.3;
+            break;
+          case 'neutral':
+          default:
+            // No additional morph targets for neutral, or reset if needed
+            break;
+        }
+
+        return morphTargets;
+      };
+
+      const animation = getAnimationFromResponse(response);
+      const morphTargets = getMorphTargetsFromResponse(response);
+
       // Voice RSS Text-to-Speech
       const voiceRSSApiKey = process.env.VOICE_RSS_API_KEY;
       let audioContent = null;
 
       if (voiceRSSApiKey) {
-        const ttsResponse = await fetch(`https://api.voicerss.org/?key=${voiceRSSApiKey}&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`);
+        const ttsResponse = await fetch(`https://voicerss.org/api/?key=${voiceRSSApiKey}&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`);
         if (ttsResponse.ok) {
           const audioBuffer = await ttsResponse.arrayBuffer();
           audioContent = Buffer.from(audioBuffer).toString('base64');
@@ -192,8 +280,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.warn("VOICE_RSS_API_KEY not set. Skipping TTS.");
       }
 
-      const animationData = { animation: "talking", emotion: "neutral" };
-      const metadataString = JSON.stringify(animationData);
+      const metadata = { animation, morphTargets };
+      const metadataString = JSON.stringify(metadata);
       console.log('Metadata string:', metadataString, 'Length:', metadataString.length);
       if (metadataString.length > 500) {
         return res.status(400).json({ message: "Metadata too long" });

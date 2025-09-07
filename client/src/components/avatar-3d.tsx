@@ -1,10 +1,9 @@
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF, OrbitControls, useAnimations, Loader, Environment, AccumulativeShadows, RandomizedLight } from '@react-three/drei'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useGLTF, OrbitControls, useAnimations, Loader } from '@react-three/drei'
 import { Suspense, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import * as THREE from 'three'
-import { EffectComposer, Bloom } from '@react-three/postprocessing'
 
-const Model = forwardRef((props, ref) => {
+const Model = forwardRef(({ currentAnimation, currentMorphTargets, ...props }, ref) => {
   const group = useRef()
   const { scene, animations } = useGLTF('/src/assets/my-avatar-.glb')
   const { actions, mixer } = useAnimations(animations, group)
@@ -15,6 +14,13 @@ const Model = forwardRef((props, ref) => {
     actions.idle.play();
   }, [actions]);
 
+  // Effect to play animation when currentAnimation prop changes
+  useEffect(() => {
+    if (currentAnimation && ref.current && ref.current.playAnimation) {
+      ref.current.playAnimation(currentAnimation);
+    }
+  }, [currentAnimation, ref]);
+
   useEffect(() => {
     scene.traverse((obj) => {
       if (obj.isSkinnedMesh && obj.name === 'mesh_3') {
@@ -23,6 +29,18 @@ const Model = forwardRef((props, ref) => {
     });
   }, [scene]);
 
+  // Effect to apply morph targets when currentMorphTargets prop changes
+  useEffect(() => {
+    if (headMesh.current && currentMorphTargets) {
+      for (const [key, value] of Object.entries(currentMorphTargets)) {
+        const morphTargetIndex = headMesh.current.morphTargetDictionary[key];
+        if (morphTargetIndex !== undefined) {
+          headMesh.current.morphTargetInfluences[morphTargetIndex] = value;
+        }
+      }
+    }
+  }, [currentMorphTargets]);
+
   useFrame(() => {
     if (headMesh.current) {
       const eyeBlinkLeftIndex = headMesh.current.morphTargetDictionary['eyeBlinkLeft'];
@@ -30,6 +48,10 @@ const Model = forwardRef((props, ref) => {
       const browInnerUpIndex = headMesh.current.morphTargetDictionary['browInnerUp'];
       const browDownLeftIndex = headMesh.current.morphTargetDictionary['browDownLeft'];
       const browDownRightIndex = headMesh.current.morphTargetDictionary['browDownRight'];
+      const mouthSmileLeftIndex = headMesh.current.morphTargetDictionary['mouthSmileLeft'];
+      const mouthSmileRightIndex = headMesh.current.morphTargetDictionary['mouthSmileRight'];
+      const noseSneerLeftIndex = headMesh.current.morphTargetDictionary['noseSneerLeft'];
+      const noseSneerRightIndex = headMesh.current.morphTargetDictionary['noseSneerRight'];
       
       const eyeLookUpLeft = headMesh.current.morphTargetDictionary['eyeLookUpLeft'];
       const eyeLookUpRight = headMesh.current.morphTargetDictionary['eyeLookUpRight'];
@@ -40,62 +62,94 @@ const Model = forwardRef((props, ref) => {
       const eyeLookOutLeft = headMesh.current.morphTargetDictionary['eyeLookOutLeft'];
       const eyeLookOutRight = headMesh.current.morphTargetDictionary['eyeLookOutRight'];
 
-      // --- Blinking ---
       const time = clock.getElapsedTime();
-      const blinkCycle = time % 3; // Every 3 seconds
-      let blinkValue = 0;
-      if (blinkCycle > 2.8) {
-        blinkValue = Math.sin((blinkCycle - 2.8) / 0.2 * Math.PI);
-      }
-      
-      if (eyeBlinkLeftIndex !== undefined) {
-        headMesh.current.morphTargetInfluences[eyeBlinkLeftIndex] = blinkValue;
-      }
-      if (eyeBlinkRightIndex !== undefined) {
-        headMesh.current.morphTargetInfluences[eyeBlinkRightIndex] = blinkValue;
+
+      // Reset all morph targets to 0 before applying new values
+      for (const key in headMesh.current.morphTargetDictionary) {
+        const index = headMesh.current.morphTargetDictionary[key];
+        headMesh.current.morphTargetInfluences[index] = 0;
       }
 
-      // --- Natural Expressions ---
-      // Subtle brow movement
-      if (browInnerUpIndex !== undefined) {
-          const browValue = (Math.sin(time * 0.5) + 1) / 2 * 0.3; // slow up and down
-          headMesh.current.morphTargetInfluences[browInnerUpIndex] = browValue;
-      }
-      if (browDownLeftIndex !== undefined && browDownRightIndex !== undefined) {
-          const browValue = (Math.sin(time * 0.7) + 1) / 2 * 0.2; // slow up and down
-          headMesh.current.morphTargetInfluences[browDownLeftIndex] = browValue;
-          headMesh.current.morphTargetInfluences[browDownRightIndex] = browValue;
+      // Apply morph targets from props (backend-driven)
+      if (currentMorphTargets) {
+        for (const [key, value] of Object.entries(currentMorphTargets)) {
+          const morphTargetIndex = headMesh.current.morphTargetDictionary[key];
+          if (morphTargetIndex !== undefined) {
+            headMesh.current.morphTargetInfluences[morphTargetIndex] = value;
+          }
+        }
       }
 
-      // --- Gaze Shifting ---
-      const gazeX = Math.sin(time * 0.4) * 0.5; // -0.5 to 0.5
-      const gazeY = Math.cos(time * 0.3) * 0.5; // -0.5 to 0.5
+      // Apply procedural animations only if not overridden by currentMorphTargets
+      if (!currentMorphTargets || Object.keys(currentMorphTargets).length === 0) {
+        // --- Blinking ---
+        const blinkCycle = time % 3; // Every 3 seconds
+        let blinkValue = 0;
+        if (blinkCycle > 2.8) {
+          blinkValue = Math.sin((blinkCycle - 2.8) / 0.2 * Math.PI);
+        }
+        
+        if (eyeBlinkLeftIndex !== undefined) {
+          headMesh.current.morphTargetInfluences[eyeBlinkLeftIndex] = blinkValue;
+        }
+        if (eyeBlinkRightIndex !== undefined) {
+          headMesh.current.morphTargetInfluences[eyeBlinkRightIndex] = blinkValue;
+        }
 
-      // Reset gaze
-      if (eyeLookUpLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpLeft] = 0;
-      if (eyeLookUpRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpRight] = 0;
-      if (eyeLookDownLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownLeft] = 0;
-      if (eyeLookDownRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownRight] = 0;
-      if (eyeLookInLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookInLeft] = 0;
-      if (eyeLookInRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookInRight] = 0;
-      if (eyeLookOutLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutLeft] = 0;
-      if (eyeLookOutRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutRight] = 0;
+        // --- Natural Expressions (Subtle brow movement) ---
+        if (browInnerUpIndex !== undefined) {
+            const browValue = (Math.sin(time * 0.5) + 1) / 2 * 0.3; // slow up and down
+            headMesh.current.morphTargetInfluences[browInnerUpIndex] = browValue;
+        }
+        if (browDownLeftIndex !== undefined && browDownRightIndex !== undefined) {
+            const browValue = (Math.sin(time * 0.7) + 1) / 2 * 0.2; // slow up and down
+            headMesh.current.morphTargetInfluences[browDownLeftIndex] = browValue;
+            headMesh.current.morphTargetInfluences[browDownRightIndex] = browValue;
+        }
 
-      // Apply new gaze
-      if (gazeX > 0) { // Look right
-        if (eyeLookInLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookInLeft] = gazeX;
-        if (eyeLookOutRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutRight] = gazeX;
-      } else { // Look left
-        if (eyeLookOutLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutLeft] = -gazeX;
-        if (eyeLookInRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookInRight] = -gazeX;
-      }
+        // --- Gaze Shifting ---
+        const gazeX = Math.sin(time * 0.4) * 0.5; // -0.5 to 0.5
+        const gazeY = Math.cos(time * 0.3) * 0.5; // -0.5 to 0.5
 
-      if (gazeY > 0) { // Look up
-        if (eyeLookUpLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpLeft] = gazeY;
-        if (eyeLookUpRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpRight] = gazeY;
-      } else { // Look down
-        if (eyeLookDownLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownLeft] = -gazeY;
-        if (eyeLookDownRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownRight] = -gazeY;
+        // Apply new gaze
+        if (gazeX > 0) { // Look right
+          if (eyeLookInLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookInLeft] = gazeX;
+          if (eyeLookOutRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutRight] = gazeX;
+        } else { // Look left
+          if (eyeLookOutLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutLeft] = -gazeX;
+          if (eyeLookInRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookInRight] = -gazeX;
+        }
+
+        if (gazeY > 0) { // Look up
+          if (eyeLookUpLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpLeft] = gazeY;
+          if (eyeLookUpRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpRight] = gazeY;
+        } else { // Look down
+          if (eyeLookDownLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownLeft] = -gazeY;
+          if (eyeLookDownRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownRight] = -gazeY;
+        }
+
+        // --- Idle Expressions (Funny and Curious) ---
+        if (currentAnimation === 'idle') {
+          // Subtle brow raise/lower for curiosity
+          if (browInnerUpIndex !== undefined) {
+            headMesh.current.morphTargetInfluences[browInnerUpIndex] = (Math.sin(time * 0.8) + 1) / 2 * 0.2; // 0 to 0.2
+          }
+          // Subtle eye widening
+          if (eyeLookUpLeft !== undefined) {
+            headMesh.current.morphTargetInfluences[eyeLookUpLeft] = (Math.sin(time * 0.6 + 0.5) + 1) / 2 * 0.1; // 0 to 0.1
+            headMesh.current.morphTargetInfluences[eyeLookUpRight] = (Math.sin(time * 0.6 + 0.5) + 1) / 2 * 0.1;
+          }
+          // Subtle, almost imperceptible smile
+          if (mouthSmileLeftIndex !== undefined) {
+            headMesh.current.morphTargetInfluences[mouthSmileLeftIndex] = (Math.sin(time * 0.7 + 1) + 1) / 2 * 0.05; // 0 to 0.05
+            headMesh.current.morphTargetInfluences[mouthSmileRightIndex] = (Math.sin(time * 0.7 + 1) + 1) / 2 * 0.05;
+          }
+          // Subtle nose twitch for funny
+          if (noseSneerLeftIndex !== undefined) {
+            headMesh.current.morphTargetInfluences[noseSneerLeftIndex] = (Math.sin(time * 0.9 + 2) + 1) / 2 * 0.03; // 0 to 0.03
+            headMesh.current.morphTargetInfluences[noseSneerRightIndex] = (Math.sin(time * 0.9 + 2) + 1) / 2 * 0.03;
+          }
+        }
       }
     }
   });
@@ -124,6 +178,13 @@ const Model = forwardRef((props, ref) => {
 
   // We only need an effect to ensure all meshes in the model can cast shadows.
   // The positioning and scaling is now handled declaratively in the JSX below.
+  useEffect(() => {
+    scene.traverse((obj) => {
+      if (obj.isMesh) {
+        obj.castShadow = true;
+      }
+    });
+  }, [scene]);
 
   // By wrapping the model in a group and applying transformations here,
   // we ensure the position is fixed and doesn't shift on page navigation.
@@ -136,7 +197,14 @@ const Model = forwardRef((props, ref) => {
   );
 })
 
-const Avatar3D = forwardRef((props, ref) => {
+interface Avatar3DProps {
+  currentAnimation?: string;
+  currentMorphTargets?: { [key: string]: number };
+}
+
+export default function Avatar3D({ currentAnimation, currentMorphTargets }: Avatar3DProps) {
+  const modelRef = useRef()
+
   return (
     <>
       {/*
@@ -145,40 +213,25 @@ const Avatar3D = forwardRef((props, ref) => {
         - `fov` (field of view) acts like zoom. A smaller `fov` is more zoomed in.
         - `gl={{ preserveDrawingBuffer: true }}` can help prevent flickering on route changes.
       */}
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping }}>
-        <ambientLight intensity={0.3} />
-        <GradientBackground />
-        {/* Key Light */}
-        <spotLight
-          position={[5, 5, 5]}
-          angle={0.3}
-          penumbra={1}
-          intensity={3.0}
-          color="#fff4e5"
-          target-position={[0, 1, 0]}
+      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 2.8], fov: 30 }} shadows gl={{ preserveDrawingBuffer: true, antialias: true }}>
+        <Suspense fallback={null}>
+        <ambientLight intensity={1.2} />
+        <directionalLight
+          position={[3, 3, 3]}
+          intensity={3.5}
+          color="#FFDDBB"
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+          shadow-camera-far={15}
         />
-        {/* Fill Light */}
-        <spotLight
-          position={[-5, 2, 5]}
-          angle={0.3}
-          penumbra={1}
-          intensity={1.2}
-          color="#dbe9ff"
-          target-position={[0, 1, 0]}
+        <directionalLight
+          position={[-3, 3, -3]}
+          intensity={2.5}
+          color="#BBDDFF"
         />
-        {/* Rim Light */}
-        <spotLight
-          position={[0, 3, -5]}
-          angle={0.8}
-          penumbra={1}
-          intensity={2.0}
-          color="white"
-          target-position={[0, 1, 0]}
-        />
-        <Model ref={ref} />
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.9} luminanceSmoothing={0.9} height={300} />
-        </EffectComposer>
+        <hemisphereLight groundColor="#000000" skyColor="#ffffff" intensity={1.5} />
+        <Model ref={modelRef} currentAnimation={currentAnimation} currentMorphTargets={currentMorphTargets} />
       </Suspense>
       <OrbitControls
         // The target is now lowered to better frame the upper body
@@ -192,39 +245,6 @@ const Avatar3D = forwardRef((props, ref) => {
       <Loader />
     </>
   )
-})
-
-export default Avatar3D;
+}
 
 useGLTF.preload('/src/assets/my-avatar-.glb')
-
-const GradientBackground = () => {
-  const { viewport } = useThree();
-  const material = new THREE.ShaderMaterial({
-    uniforms: {
-      color1: { value: new THREE.Color('#0f0f0f') },
-      color2: { value: new THREE.Color('#2b2b2b') },
-    },
-    vertexShader: `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform vec3 color1;
-      uniform vec3 color2;
-      varying vec2 vUv;
-      void main() {
-        gl_FragColor = vec4(mix(color1, color2, vUv.y), 1.0);
-      }
-    `,
-  });
-
-  return (
-    <mesh material={material} position={[0, 0, -10]}>
-      <planeGeometry args={[viewport.width, viewport.height]} />
-    </mesh>
-  );
-};

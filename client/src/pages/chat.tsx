@@ -10,6 +10,8 @@ const Avatar3D = lazy(() => import("@/components/avatar-3d"));
 
 export default function Chat() {
   const [message, setMessage] = useState("");
+  const [currentAnimation, setCurrentAnimation] = useState<string | undefined>(undefined);
+  const [currentMorphTargets, setCurrentMorphTargets] = useState<{ [key: string]: number } | undefined>(undefined);
   const modelRef = useRef();
   
   const { 
@@ -23,11 +25,16 @@ export default function Chat() {
 
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage && lastMessage.response && modelRef.current) {
+    if (lastMessage && lastMessage.response) {
       try {
         const metadata = JSON.parse(lastMessage.metadata);
-        if (metadata && metadata.animation) {
-          modelRef.current.playAnimation(metadata.animation);
+        if (metadata) {
+          if (metadata.animation) {
+            setCurrentAnimation(metadata.animation);
+          }
+          if (metadata.morphTargets) {
+            setCurrentMorphTargets(metadata.morphTargets);
+          }
         }
       } catch (e) {
         console.error("Failed to parse message metadata:", e);
@@ -74,7 +81,7 @@ export default function Chat() {
             {/* Avatar Section */}
             <div className="md:w-2/5 bg-secondary border-b md:border-b-0 md:border-r h-64 md:h-auto">
               <Suspense fallback={<div className="w-full h-full flex justify-center items-center"><Loader2 className="w-16 h-16 animate-spin" /></div>}>
-                <Avatar3D ref={modelRef} />
+                <Avatar3D ref={modelRef} currentAnimation={currentAnimation} currentMorphTargets={currentMorphTargets} />
               </Suspense>
             </div>
 
