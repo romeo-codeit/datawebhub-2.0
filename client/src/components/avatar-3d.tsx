@@ -7,171 +7,158 @@ const Model = forwardRef(({ currentAnimation, currentMorphTargets, ...props }, r
   const group = useRef()
   const { scene, animations } = useGLTF('/src/assets/my-avatar-.glb')
   const { actions, mixer } = useAnimations(animations, group)
-  const headMesh = useRef();
+  const skinnedMeshes = useRef([]);
   const clock = new THREE.Clock();
 
   useEffect(() => {
-    actions.idle.play();
-  }, [actions]);
+    const meshes = [];
+    scene.traverse((obj) => {
+      // We are looking for skinned meshes that have morph targets
+      if (obj.isSkinnedMesh && obj.morphTargetDictionary) {
+        meshes.push(obj);
+      }
+    });
+    skinnedMeshes.current = meshes;
+  }, [scene]);
 
   // Effect to play animation when currentAnimation prop changes
   useEffect(() => {
-    if (currentAnimation && ref.current && ref.current.playAnimation) {
-      ref.current.playAnimation(currentAnimation);
+    if (ref.current && ref.current.playAnimation) {
+      ref.current.playAnimation(currentAnimation || 'idle');
     }
   }, [currentAnimation, ref]);
 
-  useEffect(() => {
-    scene.traverse((obj) => {
-      if (obj.isSkinnedMesh && obj.name === 'mesh_3') {
-        headMesh.current = obj;
-      }
-    });
-  }, [scene]);
-
   // Effect to apply morph targets when currentMorphTargets prop changes
   useEffect(() => {
-    if (headMesh.current && currentMorphTargets) {
-      for (const [key, value] of Object.entries(currentMorphTargets)) {
-        const morphTargetIndex = headMesh.current.morphTargetDictionary[key];
-        if (morphTargetIndex !== undefined) {
-          headMesh.current.morphTargetInfluences[morphTargetIndex] = value;
+    if (skinnedMeshes.current.length > 0 && currentMorphTargets) {
+      // Reset all morph targets to 0 before applying new values
+      skinnedMeshes.current.forEach(mesh => {
+        if (mesh.morphTargetInfluences) {
+          mesh.morphTargetInfluences.fill(0);
         }
+      });
+
+      for (const [key, value] of Object.entries(currentMorphTargets)) {
+        skinnedMeshes.current.forEach(mesh => {
+          const morphTargetIndex = mesh.morphTargetDictionary[key];
+          if (morphTargetIndex !== undefined) {
+            mesh.morphTargetInfluences[morphTargetIndex] = value;
+          }
+        });
       }
     }
   }, [currentMorphTargets]);
 
   useFrame(() => {
-    if (headMesh.current) {
-      const eyeBlinkLeftIndex = headMesh.current.morphTargetDictionary['eyeBlinkLeft'];
-      const eyeBlinkRightIndex = headMesh.current.morphTargetDictionary['eyeBlinkRight'];
-      const browInnerUpIndex = headMesh.current.morphTargetDictionary['browInnerUp'];
-      const browDownLeftIndex = headMesh.current.morphTargetDictionary['browDownLeft'];
-      const browDownRightIndex = headMesh.current.morphTargetDictionary['browDownRight'];
-      const mouthSmileLeftIndex = headMesh.current.morphTargetDictionary['mouthSmileLeft'];
-      const mouthSmileRightIndex = headMesh.current.morphTargetDictionary['mouthSmileRight'];
-      const noseSneerLeftIndex = headMesh.current.morphTargetDictionary['noseSneerLeft'];
-      const noseSneerRightIndex = headMesh.current.morphTargetDictionary['noseSneerRight'];
-      
-      const eyeLookUpLeft = headMesh.current.morphTargetDictionary['eyeLookUpLeft'];
-      const eyeLookUpRight = headMesh.current.morphTargetDictionary['eyeLookUpRight'];
-      const eyeLookDownLeft = headMesh.current.morphTargetDictionary['eyeLookDownLeft'];
-      const eyeLookDownRight = headMesh.current.morphTargetDictionary['eyeLookDownRight'];
-      const eyeLookInLeft = headMesh.current.morphTargetDictionary['eyeLookInLeft'];
-      const eyeLookInRight = headMesh.current.morphTargetDictionary['eyeLookInRight'];
-      const eyeLookOutLeft = headMesh.current.morphTargetDictionary['eyeLookOutLeft'];
-      const eyeLookOutRight = headMesh.current.morphTargetDictionary['eyeLookOutRight'];
-
+    // Apply procedural animations only if not overridden by currentMorphTargets from backend
+    if ((!currentMorphTargets || Object.keys(currentMorphTargets).length === 0)) {
       const time = clock.getElapsedTime();
 
-      // Reset all morph targets to 0 before applying new values
-      for (const key in headMesh.current.morphTargetDictionary) {
-        const index = headMesh.current.morphTargetDictionary[key];
-        headMesh.current.morphTargetInfluences[index] = 0;
-      }
+      // Find the head mesh for procedural animations (blinking, looking around)
+      const headMesh = skinnedMeshes.current.find(m => m.morphTargetDictionary['eyeBlinkLeft'] !== undefined);
 
-      // Apply morph targets from props (backend-driven)
-      if (currentMorphTargets) {
-        for (const [key, value] of Object.entries(currentMorphTargets)) {
-          const morphTargetIndex = headMesh.current.morphTargetDictionary[key];
-          if (morphTargetIndex !== undefined) {
-            headMesh.current.morphTargetInfluences[morphTargetIndex] = value;
+      if (headMesh) {
+        // Reset all morph targets to 0 before applying procedural animations
+        skinnedMeshes.current.forEach(mesh => {
+          if (mesh.morphTargetInfluences) {
+            mesh.morphTargetInfluences.fill(0);
           }
-        }
-      }
+        });
 
-      // Apply procedural animations only if not overridden by currentMorphTargets
-      if (!currentMorphTargets || Object.keys(currentMorphTargets).length === 0) {
+        const eyeBlinkLeftIndex = headMesh.morphTargetDictionary['eyeBlinkLeft'];
+        const eyeBlinkRightIndex = headMesh.morphTargetDictionary['eyeBlinkRight'];
+        const browInnerUpIndex = headMesh.morphTargetDictionary['browInnerUp'];
+        const browDownLeftIndex = headMesh.morphTargetDictionary['browDownLeft'];
+        const browDownRightIndex = headMesh.morphTargetDictionary['browDownRight'];
+        const eyeLookUpLeftIndex = headMesh.morphTargetDictionary['eyeLookUpLeft'];
+        const eyeLookUpRightIndex = headMesh.morphTargetDictionary['eyeLookUpRight'];
+        const eyeLookDownLeftIndex = headMesh.morphTargetDictionary['eyeLookDownLeft'];
+        const eyeLookDownRightIndex = headMesh.morphTargetDictionary['eyeLookDownRight'];
+        const eyeLookInLeftIndex = headMesh.morphTargetDictionary['eyeLookInLeft'];
+        const eyeLookInRightIndex = headMesh.morphTargetDictionary['eyeLookInRight'];
+        const eyeLookOutLeftIndex = headMesh.morphTargetDictionary['eyeLookOutLeft'];
+        const eyeLookOutRightIndex = headMesh.morphTargetDictionary['eyeLookOutRight'];
+
         // --- Blinking ---
         const blinkCycle = time % 3; // Every 3 seconds
         let blinkValue = 0;
         if (blinkCycle > 2.8) {
           blinkValue = Math.sin((blinkCycle - 2.8) / 0.2 * Math.PI);
         }
-        
-        if (eyeBlinkLeftIndex !== undefined) {
-          headMesh.current.morphTargetInfluences[eyeBlinkLeftIndex] = blinkValue;
-        }
-        if (eyeBlinkRightIndex !== undefined) {
-          headMesh.current.morphTargetInfluences[eyeBlinkRightIndex] = blinkValue;
-        }
+        if (eyeBlinkLeftIndex !== undefined) headMesh.morphTargetInfluences[eyeBlinkLeftIndex] = blinkValue;
+        if (eyeBlinkRightIndex !== undefined) headMesh.morphTargetInfluences[eyeBlinkRightIndex] = blinkValue;
 
         // --- Natural Expressions (Subtle brow movement) ---
         if (browInnerUpIndex !== undefined) {
-            const browValue = (Math.sin(time * 0.5) + 1) / 2 * 0.3; // slow up and down
-            headMesh.current.morphTargetInfluences[browInnerUpIndex] = browValue;
+          const browValue = (Math.sin(time * 0.5) + 1) / 2 * 0.3;
+          headMesh.morphTargetInfluences[browInnerUpIndex] = browValue;
         }
         if (browDownLeftIndex !== undefined && browDownRightIndex !== undefined) {
-            const browValue = (Math.sin(time * 0.7) + 1) / 2 * 0.2; // slow up and down
-            headMesh.current.morphTargetInfluences[browDownLeftIndex] = browValue;
-            headMesh.current.morphTargetInfluences[browDownRightIndex] = browValue;
+          const browValue = (Math.sin(time * 0.7) + 1) / 2 * 0.2;
+          headMesh.morphTargetInfluences[browDownLeftIndex] = browValue;
+          headMesh.morphTargetInfluences[browDownRightIndex] = browValue;
         }
 
         // --- Gaze Shifting ---
-        const gazeX = Math.sin(time * 0.4) * 0.5; // -0.5 to 0.5
-        const gazeY = Math.cos(time * 0.3) * 0.5; // -0.5 to 0.5
+        const gazeX = Math.sin(time * 0.4) * 0.5;
+        const gazeY = Math.cos(time * 0.3) * 0.5;
 
-        // Apply new gaze
         if (gazeX > 0) { // Look right
-          if (eyeLookInLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookInLeft] = gazeX;
-          if (eyeLookOutRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutRight] = gazeX;
+          if (eyeLookInLeftIndex !== undefined) headMesh.morphTargetInfluences[eyeLookInLeftIndex] = gazeX;
+          if (eyeLookOutRightIndex !== undefined) headMesh.morphTargetInfluences[eyeLookOutRightIndex] = gazeX;
         } else { // Look left
-          if (eyeLookOutLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookOutLeft] = -gazeX;
-          if (eyeLookInRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookInRight] = -gazeX;
+          if (eyeLookOutLeftIndex !== undefined) headMesh.morphTargetInfluences[eyeLookOutLeftIndex] = -gazeX;
+          if (eyeLookInRightIndex !== undefined) headMesh.morphTargetInfluences[eyeLookInRightIndex] = -gazeX;
         }
 
         if (gazeY > 0) { // Look up
-          if (eyeLookUpLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpLeft] = gazeY;
-          if (eyeLookUpRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookUpRight] = gazeY;
+          if (eyeLookUpLeftIndex !== undefined) headMesh.morphTargetInfluences[eyeLookUpLeftIndex] = gazeY;
+          if (eyeLookUpRightIndex !== undefined) headMesh.morphTargeInfluences[eyeLookUpRightIndex] = gazeY;
         } else { // Look down
-          if (eyeLookDownLeft !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownLeft] = -gazeY;
-          if (eyeLookDownRight !== undefined) headMesh.current.morphTargetInfluences[eyeLookDownRight] = -gazeY;
-        }
-
-        // --- Idle Expressions (Funny and Curious) ---
-        if (currentAnimation === 'idle') {
-          // Subtle brow raise/lower for curiosity
-          if (browInnerUpIndex !== undefined) {
-            headMesh.current.morphTargetInfluences[browInnerUpIndex] = (Math.sin(time * 0.8) + 1) / 2 * 0.2; // 0 to 0.2
-          }
-          // Subtle eye widening
-          if (eyeLookUpLeft !== undefined) {
-            headMesh.current.morphTargetInfluences[eyeLookUpLeft] = (Math.sin(time * 0.6 + 0.5) + 1) / 2 * 0.1; // 0 to 0.1
-            headMesh.current.morphTargetInfluences[eyeLookUpRight] = (Math.sin(time * 0.6 + 0.5) + 1) / 2 * 0.1;
-          }
-          // Subtle, almost imperceptible smile
-          if (mouthSmileLeftIndex !== undefined) {
-            headMesh.current.morphTargetInfluences[mouthSmileLeftIndex] = (Math.sin(time * 0.7 + 1) + 1) / 2 * 0.05; // 0 to 0.05
-            headMesh.current.morphTargetInfluences[mouthSmileRightIndex] = (Math.sin(time * 0.7 + 1) + 1) / 2 * 0.05;
-          }
-          // Subtle nose twitch for funny
-          if (noseSneerLeftIndex !== undefined) {
-            headMesh.current.morphTargetInfluences[noseSneerLeftIndex] = (Math.sin(time * 0.9 + 2) + 1) / 2 * 0.03; // 0 to 0.03
-            headMesh.current.morphTargetInfluences[noseSneerRightIndex] = (Math.sin(time * 0.9 + 2) + 1) / 2 * 0.03;
-          }
+          if (eyeLookDownLeftIndex !== undefined) headMesh.morphTargetInfluences[eyeLookDownLeftIndex] = -gazeY;
+          if (eyeLookDownRightIndex !== undefined) headMesh.morphTargetInfluences[eyeLookDownRightIndex] = -gazeY;
         }
       }
     }
   });
 
+  const currentAnimationName = useRef('idle');
+
+  useEffect(() => {
+    const onFinished = (e) => {
+      // When a non-looped animation finishes, transition back to idle
+      if (e.action.loop !== THREE.LoopRepeat) {
+        // Ensure we are not already trying to play idle
+        if (currentAnimationName.current !== 'idle') {
+          ref.current?.playAnimation('idle');
+        }
+      }
+    };
+
+    mixer.addEventListener('finished', onFinished);
+
+    return () => {
+      mixer.removeEventListener('finished', onFinished);
+    };
+  }, [mixer, ref]);
+
   useImperativeHandle(ref, () => ({
     playAnimation: (name) => {
-      if (!actions[name]) return;
+      if (!actions[name] || currentAnimationName.current === name) return;
 
-      const from = actions.idle;
-      const to = actions[name];
+      const fromAction = actions[currentAnimationName.current];
+      const toAction = actions[name];
 
-      from.reset().crossFadeTo(to, 0.3, true).play();
+      if (!fromAction || !toAction) return;
+
+      fromAction.reset().crossFadeTo(toAction, 0.3, true).play();
+      currentAnimationName.current = name;
 
       if (name !== 'idle') {
-        to.clampWhenFinished = true;
-        to.loop = THREE.LoopOnce;
-
-        const onFinished = () => {
-          to.crossFadeTo(from.reset(), 0.3, true).play();
-          mixer.removeEventListener('finished', onFinished);
-        }
-        mixer.addEventListener('finished', onFinished);
+        toAction.clampWhenFinished = true;
+        toAction.loop = THREE.LoopOnce;
+      } else {
+        toAction.loop = THREE.LoopRepeat;
       }
     }
   }));

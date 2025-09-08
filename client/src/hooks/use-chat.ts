@@ -1,10 +1,11 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { ChatMessage, Prompt } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 export function useChat() {
-  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const sessionId = localStorage.getItem('sessionId');
 
@@ -33,21 +34,30 @@ export function useChat() {
       queryClient.setQueryData<ChatMessage[]>(['/api/chat/messages', sessionId], (oldMessages = []) => {
         return [...oldMessages, chatMessage];
       });
-      setError(null);
 
       // Play audio if available
       if (audioContent) {
         const audio = new Audio(`data:audio/mp3;base64,${audioContent}`);
-        audio.play().catch(e => console.error("Error playing audio:", e));
+        audio.play().catch(e => {
+          console.error("Error playing audio:", e);
+          toast({
+            title: "Audio Error",
+            description: "Could not play the generated audio.",
+            variant: "destructive",
+          });
+        });
       }
     },
     onError: (err: Error) => {
-      setError(err.message || 'Failed to send message');
+      toast({
+        title: "Error",
+        description: err.message || "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
   const sendMessage = useCallback(async (message: string, prompts: Prompt[]) => {
-    setError(null);
     return sendMessageMutation.mutateAsync({ message, prompts });
   }, [sendMessageMutation]);
 
@@ -56,6 +66,5 @@ export function useChat() {
     sendMessage,
     isLoading: sendMessageMutation.isPending,
     isLoadingMessages,
-    error: error || (sendMessageMutation.error?.message),
   };
 }

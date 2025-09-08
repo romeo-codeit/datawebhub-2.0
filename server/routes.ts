@@ -218,44 +218,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return "idle"; // Default to idle if no response
       };
 
-      // Function to determine morph targets based on response content (placeholder for advanced lip-sync)
+      // Function to determine morph targets for emotion and basic lip-sync
       const getMorphTargetsFromResponse = (text: string) => {
         const lowerText = text.toLowerCase();
-        let emotion: 'neutral' | 'curious' | 'amused' = 'neutral';
-
-        // Basic sentiment inference based on keywords
-        if (lowerText.includes("curious") || lowerText.includes("wonder") || lowerText.includes("question")) {
-          emotion = 'curious';
-        } else if (lowerText.includes("funny") || lowerText.includes("amused") || lowerText.includes("haha")) {
-          emotion = 'amused';
-        }
-
-        // Base talking morph targets
         let morphTargets: { [key: string]: number } = {};
-        if (text.length > 0) {
-          morphTargets = {
-            jawOpen: 0.3, // Simulate mouth opening for talking
-            mouthPucker: 0.1, // Slight pucker
-          };
+
+        // --- Emotional Expression ---
+        if (lowerText.includes("curious") || lowerText.includes("wonder") || lowerText.includes("question")) {
+          morphTargets.browInnerUp = 0.4;
+          morphTargets.eyeWideLeft = 0.2;
+          morphTargets.eyeWideRight = 0.2;
+        } else if (lowerText.includes("funny") || lowerText.includes("amused") || lowerText.includes("haha")) {
+          morphTargets.mouthSmileLeft = 0.5;
+          morphTargets.mouthSmileRight = 0.5;
+          morphTargets.cheekSquintLeft = 0.3;
+          morphTargets.cheekSquintRight = 0.3;
         }
 
-        // Apply emotion-specific morph targets
-        switch (emotion) {
-          case 'curious':
-            morphTargets.browInnerUp = 0.4; // Raise inner brows
-            morphTargets.eyeWideLeft = 0.2; // Slightly widen eyes
-            morphTargets.eyeWideRight = 0.2;
-            break;
-          case 'amused':
-            morphTargets.mouthSmileLeft = 0.5; // Smile
-            morphTargets.mouthSmileRight = 0.5;
-            morphTargets.cheekSquintLeft = 0.3; // Squint cheeks slightly
-            morphTargets.cheekSquintRight = 0.3;
-            break;
-          case 'neutral':
-          default:
-            // No additional morph targets for neutral, or reset if needed
-            break;
+        // --- Lip Sync (Viseme Generation) ---
+        // This is a simplified approach that creates an "average" mouth shape for the text.
+        if (text.length > 0) {
+          const visemeMap = {
+            'a': ['aa'], 'e': ['E'], 'i': ['ih'], 'o': ['oh'], 'u': ['ou'],
+            'r': ['RR'],
+            'f': ['FF'], 'v': ['FF'],
+            't': ['DD'], 'd': ['DD'], 'g': ['kk'],
+            'c': ['kk'], 'k': ['kk'], 'q': ['kk'],
+            'n': ['nn'], 'm': ['nn'],
+            's': ['SS'], 'z': ['SS'],
+            'c_h': ['CH'], 's_h': ['CH'], 'j': ['CH'],
+            'p': ['PP'], 'b': ['PP'],
+            't_h': ['TH']
+          };
+
+          let visemeActivation: { [key: string]: number } = {};
+
+          // Initialize activations
+          Object.values(visemeMap).flat().forEach(v => visemeActivation[v] = 0);
+
+          // Check for digraphs first
+          const processedText = lowerText.replace(/ch/g, 'c_h').replace(/sh/g, 's_h').replace(/th/g, 't_h');
+
+          for (const char of processedText) {
+            if (visemeMap[char]) {
+              visemeMap[char].forEach(v => visemeActivation[v] += 1);
+            }
+          }
+
+          // Normalize and add to morph targets
+          const totalActivations = Object.values(visemeActivation).reduce((sum, val) => sum + val, 0);
+          if (totalActivations > 0) {
+            morphTargets['jawOpen'] = 0; // Start with jaw closed
+            for (const viseme in visemeActivation) {
+              const value = visemeActivation[viseme] / totalActivations;
+              morphTargets[viseme] = value * 2; // Amplify the effect
+              // Open the jaw for vowel sounds
+              if (['aa', 'E', 'ih', 'oh', 'ou'].includes(viseme)) {
+                morphTargets['jawOpen'] += value * 0.8;
+              }
+            }
+          } else {
+            // Default talking pose if no specific visemes are found
+            morphTargets['jawOpen'] = 0.3;
+            morphTargets['mouthPucker'] = 0.1;
+          }
+        }
+
+        // Clamp values between 0 and 1
+        for (const key in morphTargets) {
+          morphTargets[key] = Math.max(0, Math.min(1, morphTargets[key]));
         }
 
         return morphTargets;
@@ -269,12 +300,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let audioContent = null;
 
       if (voiceRSSApiKey) {
-        const ttsResponse = await fetch(`https://voicerss.org/api/?key=${voiceRSSApiKey}&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`);
-        if (ttsResponse.ok) {
-          const audioBuffer = await ttsResponse.arrayBuffer();
-          audioContent = Buffer.from(audioBuffer).toString('base64');
-        } else {
-          console.error("Voice RSS TTS API Error:", await ttsResponse.text());
+        console.log("Attempting to generate TTS with VoiceRSS...");
+        const ttsUrl = `https://voicerss.org/api/?key=...&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`;
+        console.log("Fetching TTS from URL (key omitted):", ttsUrl.replace(/key=[^&]+&/, 'key=...&'));
+
+        try {
+          const ttsResponse = await fetch(`https://voicerss.org/api/?key=${voiceRSSApiKey}&hl=en-ca&v=Mason&c=MP3&f=48khz_16bit_stereo&src=${encodeURIComponent(response)}`);
+
+          console.log("VoiceRSS API Response Status:", ttsResponse.status);
+
+          if (ttsResponse.ok) {
+            const audioBuffer = await ttsResponse.arrayBuffer();
+            audioContent = Buffer.from(audioBuffer).toString('base64');
+            console.log("Successfully fetched and encoded TTS audio.");
+          } else {
+            const errorText = await ttsResponse.text();
+            console.error("Voice RSS TTS API Error Response:", errorText);
+          }
+        } catch (ttsError) {
+          console.error("An exception occurred during TTS fetch:", ttsError);
         }
       } else {
         console.warn("VOICE_RSS_API_KEY not set. Skipping TTS.");
